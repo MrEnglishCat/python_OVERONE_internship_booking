@@ -10,7 +10,7 @@ from datetime import datetime, UTC
 
 
 class FromJSONToDataBase:
-
+    # TODO https://api.hh.ru/areas ---- api получения стран рядом с РБ. Вместе с их городами
 
     def load_env_data(self):
         env = environs.Env()
