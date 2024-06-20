@@ -4,6 +4,8 @@ import json
 import os
 import re
 from copy import deepcopy
+from pprint import pprint
+
 import environs
 import psycopg2
 from datetime import datetime, UTC
@@ -18,6 +20,7 @@ class FromJSONToDataBase:
         return env.str('DB_NAME'), env.str('DB_HOST'), env.str('DB_PORT'), env.str('DB_USER'), env.str('DB_PASSWORD')
 
     def connect_to_db(self, database, host, port, user, password):
+        print(database)
         try:
             connection = psycopg2.connect(
                 f"host={host} dbname={database} user={user} password={password} port={port}"
@@ -51,18 +54,15 @@ class FromJSONToDataBase:
     @staticmethod
     def _get_load_json(path):
         if os.path.isfile(path):
-                with open('path', 'r', encoding='utf8') as f:
-                    data = json.load(f)
-                    return data
+            with open(path, 'r', encoding='utf8') as f:
+                data = json.load(f)
+                return data
         else:
             print(f'{path} is not a file!')
-
 
     @staticmethod
     def _parse_object_list_to_int(obj):
         return obj if isinstance(obj, int | None) else obj[0]
-
-
 
     def _read_row_from_db(self, cursor, table_field_id, table, where_field: str | tuple, equal_field: str | tuple,
                           fetchone=True, multiply_where=False):
@@ -215,202 +215,240 @@ class FromJSONToDataBase:
         connection = self.connect_to_db(*self.load_env_data())
 
         if connection:
-            json_data = self._get_load_json()
-            for_add_to_database = self._from_json_to_dataclass(json_data)
-            # TODO: нужно что-то придумать с многократным вызовом метода i_o_db_operations
-            # TODO: 1а идея это все параметры закинуть в список словарей и потом распаковывать
-            for car in for_add_to_database:
-                if car.manufacturer_name in self.CHANGE_MANUFACTURERS:
-                    car.manufacturer_name = self.CHANGE_MANUFACTURERS[car.manufacturer_name]
-                else:
-                    car.manufacturer_name = car.manufacturer_name.title()
-                if car.model_name.isalpha():
-                    car.model_name = car.model_name.title()
+            cursor = connection.cursor()
 
-                manufacturer_id = self.i_o_db_operations(
-                    connection,
-                    "api_autobuy_carmanufacturer",
-                    where_field="manufacturer_name",
-                    equal_field=car.manufacturer_name,
-                    list_of_fields=("manufacturer_name",),
-                    data=(car.manufacturer_name,),
-                )
+            # Страны, регионы, города
+            # json_data = self._get_load_json('files/countries_db.json')
+            # # TODO: нужно что-то придумать с многократным вызовом метода i_o_db_operations
+            # # TODO: 1а идея это все параметры закинуть в список словарей и потом распаковывать
+            # for country, regions in json_data.items():
+            #     if country in ("Россия", "Беларусь", "Украина"):
+            #         try:
+            #             cursor.execute(f"INSERT INTO api_apartment_search_countrymodel (name) VALUES ('{country}') RETURNING id;")
+            #             country_id = cursor.fetchone()[0]
+            #         except:
+            #             connection.commit()
+            #             cursor.execute(f"SELECT id FROM api_apartment_search_countrymodel WHERE name = '{country}';")
+            #             country_id = cursor.fetchone()[0]
+            #         connection.commit()
+            #         print(country_id)
+            #         for region, cities in regions.items():
+            #             try:
+            #                 cursor.execute(
+            #                     f"INSERT INTO api_apartment_search_regionmodel (name, country_id) VALUES ('{region}', '{country_id}') RETURNING id;")
+            #                 region_id = cursor.fetchone()[0]
+            #             except:
+            #                 connection.commit()
+            #                 cursor.execute(
+            #                     f"SELECT id FROM api_apartment_search_regionmodel WHERE name = '{region}' AND country_id = '{country_id}';")
+            #                 region_id = cursor.fetchone()[0]
+            #             connection.commit()
+            #
+            #             for city in cities:
+            #                 try:
+            #                     cursor.execute(
+            #                         f"INSERT INTO api_apartment_search_citymodel (name, country_id, region_id) VALUES ('{city}', '{country_id}', '{region_id}') RETURNING id;")
+            #                     city_id = cursor.fetchone()[0]
+            #                 except:
+            #                     connection.commit()
+            #                     cursor.execute(
+            #                         f"SELECT id FROM api_apartment_search_citymodel WHERE name = '{region}' AND country_id = '{country_id}' AND region_id = '{region_id}';")
+            #                     city_id = cursor.fetchone()[0]
+            #                 connection.commit()
 
-                model_id = self.i_o_db_operations(
-                    connection,
-                    "api_autobuy_carmodel",
-                    where_field="model_name",
-                    equal_field=car.model_name,
-                    list_of_fields=("model_name", "model_url", "manufacturer_id"),
-                    data=((car.model_name, car.model_url, manufacturer_id),)
-                )
+            # # Типы улиц
+            # street_types = ['бульвар', 'переулок', 'проспект', 'улица', 'шоссе', 'аллея', 'дорога', 'дорожка', 'жилмассив', 'киломерт', 'линия', 'набережная', 'площадь', 'проезд', 'просека', 'просёлок', 'проулок', 'спуск', 'трасса', 'тупик']
+            # for street_type in street_types:
+            #     try:
+            #         cursor.execute(
+            #             f"INSERT INTO api_apartment_search_streettypemodel (type) VALUES ('{street_type}') RETURNING id;")
+            #         street_type_id = cursor.fetchone()[0]
+            #     except:
+            #         connection.commit()
+            #         cursor.execute(
+            #             f"SELECT id FROM api_apartment_search_streettypemodel WHERE type = '{street_type}' ;")
+            #         street_type_id = cursor.fetchone()[0]
+            #     connection.commit()
 
-                general_attributes_integer_id = self.i_o_db_operations(
-                    connection,
-                    "api_autobuy_cargeneralattributesinteger",
-                    where_field=("year_of_car_manufacture", "engine_capacity", "car_mileage", "power_reserve", "price"),
-                    equal_field=(
-                        car.general_attributes_integer.get("year_of_car_manufacture"),
-                        car.general_attributes_integer.get("engine_capacity"),
-                        car.general_attributes_integer.get("car_mileage"),
-                        car.general_attributes_integer.get("power_reserve"),
-                        car.general_attributes_integer.get("price")
-                    ),
-                    multiply_where=True,
-                    list_of_fields=(
-                        "year_of_car_manufacture", "engine_capacity", "car_mileage", "power_reserve", "price"),
-                    data=(
-                        (
-                            car.general_attributes_integer.get("year_of_car_manufacture"),
-                            car.general_attributes_integer.get("engine_capacity"),
-                            car.general_attributes_integer.get("car_mileage"),
-                            car.general_attributes_integer.get("power_reserve"),
-                            car.general_attributes_integer.get("price")
-                        ),
-                    )
-                )
 
-                individual_attributes_id = self.i_o_db_operations(
-                    connection,
-                    "api_autobuy_carindividualattributes",
-                    where_field=("seller_comment", "car_exchange_option"),
-                    equal_field=(
-                        car.individual_attributes.get("seller_comment"),
-                        car.individual_attributes.get("car_exchange_option"),
-                    ),
-                    multiply_where=True,
-                    list_of_fields=("seller_comment", "car_exchange_option"),
-                    data=(
-                        (
-                            car.individual_attributes.get("seller_comment"),
-                            car.individual_attributes.get("car_exchange_option"),
-                        ),
-                    )
-                )
+            # Группы номеров и их типы
+            building_group_type = [
+                'Номера, спальные места',
+                'Квартиры, апартаменты',
+                'Дома, коттеджи',
+                'Отдельные комнаты',
+            ]
+            building_group_comment = [
+                'в отеле, гостевом доме или хостеле',
+                'целиком',
+                'целиком',
+                'целиком',
 
-                vin_id = self.i_o_db_operations(
-                    connection,
-                    "api_autobuy_vin",
-                    where_field="vin_value",
-                    equal_field=a if (a := car.individual_attributes.get("vin")) else "null",
-                    list_of_fields=("vin_value",),
-                    data=(a if (a := car.individual_attributes.get("vin")) else "null",),
-                    isonlyread_operation=False
-                )
+            ]
+            building_group_description = [
+                'Гостям будет предоставлен номер в отеле, гостевом доме или спальное место в хостеле',
+                'Гости снимут квартиру целиком. Вместе со всеми удобствами и кухней',
+                'Гости снимут дом целиком. Вместе с пристройками',
+                'Гости снимут отдельную комнату со спальным местом',
+            ]
 
-                automobile_id = self.i_o_db_operations(
-                    connection,
-                    "api_autobuy_carautomobile",
-                    where_field="car_url",
-                    equal_field=car.car_url,
-                    list_of_fields=(
-                        "car_url",
-                        "car_name",
-                        "counter_of_views",
-                        "image_path",
-                        "create_datetime",
-                        "manufacturer_id",
-                        "model_id",
-                        "vin_id",
-                        "general_attributes_integer_id",
-                        "individual_attributes_id"
-                    ),
-                    data=(
-                        (
-                            car.car_url,
-                            car.car_name,
-                            0,
-                            f"{self.FRONT_COMMON_IMAGE_PATH}/{re.search('(?<=https://autobuy.by/cars/).+', car.car_url).group()}",
-                            str(datetime.now(UTC)),
-                            manufacturer_id,
-                            model_id,
-                            vin_id,
-                            general_attributes_integer_id,
-                            individual_attributes_id
-                        ),
-                    )
-                )
+            building_type = {
+                'Номера, спальные места': ['Отель', 'Апарт-отель', 'Капсюльный отель', 'Санаторий', 'Гостиница',
+                                           'Мини-гостиница', 'Хостел', 'База отдыха', 'Апартамент', 'Гостевой дом',
+                                           'Отель эконом-класса', 'Пансионат', 'Глэмпинг'],
+                'Квартиры, апартаменты': ['Квартира', 'Апартамент', 'Студия'],
+                'Дома, коттеджи': ['Коттедж', 'Часть дома с отдельным входом', 'Таунхаус', 'Шале', 'Особняк', 'Дом',
+                                   'Эллинг', 'Целый этаж в доме', 'Бунгало', 'Яхта', 'Вилла', 'Деревенский дом',
+                                   'Гестхаус', 'Дом на колёсах', 'Дача'],
+                'Отдельные комнаты': ['Комната в квартире', 'Комната в частном доме', 'Комната в коттедже']
+            }
 
-                for name_attrs, value_attrs in car.general_attributes.items():
-                    general_attributes_name_id = self.i_o_db_operations(
-                        connection,
-                        "api_autobuy_cargeneralattributes",
-                        where_field="general_attributes_name",
-                        equal_field=name_attrs,
-                        list_of_fields=("general_attributes_name",),
-                        data=(name_attrs,)
-                    )
 
-                    general_attrinates_value_id = self.i_o_db_operations(
-                        connection,
-                        "api_autobuy_cargeneralattributesvalues",
-                        where_field="general_attributes_value",
-                        equal_field=value_attrs.get("BYN") if isinstance(value_attrs, dict) else value_attrs,
-                        list_of_fields=("general_attributes_value",),
-                        data=(value_attrs.get("BYN") if isinstance(value_attrs, dict) else value_attrs,),
-                    )
+            for group, comment, description in zip(building_group_type, building_group_comment, building_group_description):
+                # api_apartment_search_buildinggrouptypemodel
+                # api_apartment_search_buildingtypemodel
 
-                    self.i_o_db_operations(
-                        connection,
-                        "api_autobuy_connectorgeneralattributes",
-                        where_field=(
-                            "general_attributes_id", "general_attributes_value_id", "automobile_id"
-                        ),
-                        equal_field=(
-                            general_attributes_name_id, general_attrinates_value_id, "automobile_id"),
-                        multiply_where=True,
-                        list_of_fields=(
-                            "general_attributes_id", "general_attributes_value_id", "automobile_id"),
-                        data=(
-                            (
-                                general_attributes_name_id, general_attrinates_value_id, automobile_id
-                            ),
-                        ),
-                        isonlyread_operation=False
+                try:
+                    cursor.execute(
+                        f"INSERT INTO api_apartment_search_buildinggrouptypemodel (type, comment, description) VALUES ('{group}', '{comment}', '{description}') RETURNING id;")
+                    group_type_id = cursor.fetchone()[0]
+                except:
+                    connection.commit()
+                    cursor.execute(
+                        f"SELECT id FROM api_apartment_search_buildinggrouptypemodel WHERE type = '{group}' ;")
+                    group_type_id = cursor.fetchone()[0]
+                connection.commit()
+                type_list = building_type.get(group)
 
-                    )
+                for type in type_list:
+                    try:
+                        cursor.execute(
+                            f"INSERT INTO api_apartment_search_buildingtypemodel (name, group_id) VALUES ('{type}', '{group_type_id}') RETURNING id;")
+                        type_id = cursor.fetchone()[0]
+                    except:
+                        connection.commit()
+                        cursor.execute(
+                            f"SELECT id FROM api_apartment_search_buildingtypemodel WHERE name = '{type}' ;")
+                        type_id = cursor.fetchone()[0]
+                    connection.commit()
 
-                for group_name, options in car.car_options.items():
-                    group_id = self.i_o_db_operations(
-                        connection,
-                        "api_autobuy_groupcaroptions",
-                        where_field="group_name",
-                        equal_field=group_name,
-                        list_of_fields=("group_name",),
-                        data=(group_name,)
-                    )
-                    for option_name in options:
-                        option_id = self.i_o_db_operations(
-                            connection,
-                            "api_autobuy_caroptions",
-                            where_field="option_name",
-                            equal_field=option_name,
-                            list_of_fields=("option_name",),
-                            data=(option_name,)
-                        )
 
-                        self.i_o_db_operations(
-                            connection,
-                            "api_autobuy_connectorcaroptions",
-                            list_of_fields=("car_options_id", "group_car_option_id", "automobile_id"),
-                            data=((option_id, group_id, automobile_id),),
-                            isonlyread_operation=False
-                        )
-                # вдруг ссылки на сайт оригинала понадобятся когда-то)
-                # for image_url in car.links_to_photos:
-                #     links_to_photos_id = self.i_o_db_operations(
-                #         connection,
-                #         "api_autobuy_linkstophotos",
-                #         list_of_fields=("image_url",),
-                #         data=(image_url,),
-                #         isonlyread_operation=False
-                #     )
 
-                print(f'[INFO] Car {car.car_url}')
+            # # заполнение вариантов кроватей
+            # beds = ['односпальная кровать', 'двуспальная кровать', 'двуспальная диван-кровать',
+            #  'двуспальная широкая (king-size)', 'особо широкая двуспальная (super-king-size)', 'двухъярусная кровать',
+            #  'диван кровать']
+            # for bed in beds:
+            #     try:
+            #         cursor.execute(
+            #             f"INSERT INTO api_apartment_search_bedtypesmodel (type) VALUES ('{bed}') RETURNING id;")
+            #         bed_id = cursor.fetchone()[0]
+            #     except:
+            #         connection.commit()
+            #         cursor.execute(
+            #             f"SELECT id FROM api_apartment_search_bedtypesmodel WHERE type = '{bed}' ;")
+            #         bed_id = cursor.fetchone()[0]
+            #     connection.commit()
+
+
+            # # Заполнение вариантов удобств для ванной комнады api_apartment_search_bathroomamenitiesmodel
+            # amenities = ['биде', 'ванна', 'гигиенический душ', 'дополнительная ванная', 'дополнительный туалет', 'душ', 'общая ванная комната', 'общий туалет', 'полотенца', 'сауна', 'тапочки', 'туалетные принадлежности', 'фен', 'халат', 'общий душ/душевая']
+            #
+            # for amenity in amenities:
+            #     try:
+            #         cursor.execute(
+            #             f"INSERT INTO api_apartment_search_bathroomamenitiesmodel (name) VALUES ('{amenity}') RETURNING id;")
+            #         amenity_id = cursor.fetchone()[0]
+            #     except:
+            #         connection.commit()
+            #         cursor.execute(
+            #             f"SELECT id FROM api_apartment_search_bathroomamenitiesmodel WHERE name = '{amenity}' ;")
+            #         amenity_id = cursor.fetchone()[0]
+            #     connection.commit()
+
+
+            # # заполнение оставшихся различных удобств
+            #
+            # another_amenities = {
+            #     'Удобства':'Популярные услуги и удобства, на которые чаще всего обращают внимание гости при поиске жилья. После публикации можно добавить другие',
+            #     'Вид из окон':'Укажите, что можно увидеть из окон вашего объекта. В разделе «Фото» загрузите фотографии всех видов, которые вы отметили',
+            #     'Кухонное оборудование':'',
+            #     'Оснащение':'',
+            #     'Для отдыха в помещении':'',
+            #     'Оснащение двора':'',
+            #     'Инфраструктура и досуг рядом':'',
+            #     'Для детей':''
+            # }
+            #
+            # dict_another_amenities = {
+            #     'Удобства':['балкон', 'беспроводной интернет Wi-Fi', 'кондиционер', 'полотенца', 'постельное бельё', 'самоизоляция разрешена', 'СВЧ-печь', 'телевизор', 'фен', 'электрический чайник'],
+            #     'Вид из окон':['на море', 'на горы', 'на город', 'на реку', 'на озеро', 'на лес', 'на парк', 'на улицу', 'во двор', 'на бассейн', 'на достопримечательность', 'на сад'],
+            #     'Кухонное оборудование':['барная стойка', 'блендер', 'газовая плита', 'духовка', 'кофеварка', 'кофемашина', 'кухонный гарнитур', 'мини-бар', 'морозильник', 'мультиварка', 'обеденный стол', 'посуда и принадлежности', 'посудомоечная машина', 'СВЧ-печь', 'столовые приборы', 'тостер', 'турка для приготовления кофе', 'фильтр для воды', 'холодильник', 'электрический чайник', 'электроплита'],
+            #     'Оснащение':['балкон', 'бассейн', 'беспроводной интернет Wi-Fi', 'вентилятор', 'вешалка для одежды', 'водонагреватель', 'газовый водонагреватель', 'гардеробная', 'гостиный уголок', 'деревянный/паркетный пол', 'джакузи (гидромассажная ванна)', 'домофон', 'журнальный столик', 'звукоизоляция', 'камин', 'ковровое покрытие', 'кондиционер', 'ламинат', 'линолеум', 'место для хранения лыж / сноуборда', 'металлическая дверь', 'москитная сетка', 'новогодняя ёлка', 'обогреватель', 'одеяла с электроподогревом', 'персональный компьютер', 'плиточный/мраморный пол', 'пляжные полотенца', 'проводной интернет', 'пылесос', 'рабочий стол', 'раскладная кровать', 'сейф', 'стиральная машина', 'сушилка для белья', 'сушильная машина', 'телефон', 'утюг с гладильной доской', 'центральное отопление', 'чистящие средства', 'шкаф', 'шторы блэкаут'],
+            #     'Для отдыха в помещении':['Smart TV', 'бильярд', 'игровая консоль', 'кабельное ТВ', 'книги', 'музыкальный центр', 'настольные игры', 'настольный теннис', 'ноутбук', 'платные ТВ-каналы', 'радио', 'спутниковое ТВ', 'телевизор', 'эфирное ТВ'],
+            #     'Оснащение двора':['банный чан', 'баня (на территории)', 'барбекю/мангал', 'бассейн с подогревом', 'беседка', 'веранда', 'гамак', 'гараж', 'детские качели', 'игровая площадка', 'лодка', 'мебель на улице', 'обеденная зона на улице', 'открытый бассейн', 'охраняемая территория', 'патио', 'пляжный зонтик', 'принадлежности для барбекю', 'садовая мебель', 'спортивный зал', 'терраса', 'футбольное поле', 'шезлонги'],
+            #     'Инфраструктура и досуг рядом':['SPA-центр', 'альпинизм', 'баня (за территорией)', 'бильярдный клуб', 'боулинг', 'верховая езда', 'водные виды спорта', 'гольф', 'горные лыжи', 'езда на снегоходах', 'жильё находится в частном секторе', 'зоопарк', 'каток', 'кинотеатр', 'лес', 'ночной клуб', 'охота', 'парк аттракционов', 'прокат велосипедов', 'прокат роликовых коньков', 'пруд/озеро поблизости', 'рыбалка', 'театр', 'теннисный корт', 'Яхт-клуб'],
+            #     'Для детей':['высокий стул для ребенка', 'детская кроватка', 'детский горшок', 'защита на окнах', 'защитные крышки на розетках', 'игры/игрушки для детей', 'кровать-манеж', 'пеленальный стол', 'стульчик для кормления']
+            #
+            # }
+            # amenities_description = {
+            #     'на море':'Если из вашего окна хорошо видно море',
+            #     'на горы':'Если из окна видны горные панорамы или отдельные вершины',
+            #     'на город':'Если из окна открывается широкий панорамный вид на город',
+            #     'на реку':'Если из вашего окна хорошо видно реку',
+            #     'на озеро':'Если из вашего окна хорошо видно озеро',
+            # }
+            # for another_amenity, description in another_amenities.items():
+            #     try:
+            #         cursor.execute(
+            #             f"INSERT INTO api_apartment_search_categoriesamenitiesmodel (title, description) VALUES ('{another_amenity}', '{description}') RETURNING id;")
+            #         another_amenity_id = cursor.fetchone()[0]
+            #     except:
+            #         connection.commit()
+            #         cursor.execute(
+            #             f"SELECT id FROM api_apartment_search_categoriesamenitiesmodel WHERE title = '{another_amenity}' ;")
+            #         another_amenity_id = cursor.fetchone()[0]
+            #     connection.commit()
+            #     for amenity in dict_another_amenities.get(another_amenity):
+            #         desc = amenities_description.get(amenity, '')
+            #         try:
+            #             cursor.execute(
+            #                 f"INSERT INTO api_apartment_search_amenitiesmodel (name, description, category_id) VALUES ('{amenity}', '{desc}', '{another_amenity_id}') RETURNING id;")
+            #             amenity_id = cursor.fetchone()[0]
+            #         except:
+            #             connection.commit()
+            #             cursor.execute(
+            #                 f"SELECT id FROM api_apartment_search_amenitiesmodel WHERE name = '{amenity}' ;")
+            #             amenity_id = cursor.fetchone()[0]
+            #         connection.commit()
 
 
 db = FromJSONToDataBase()
 db.run()
+
+# Преобразование json со странами, регионами и городами
+# data = db._get_load_json('files/countries.json')
+# countries = {}
+# for row in data:
+#     country = row["name"]
+#     countries.setdefault(country, {})
+#     if row["areas"]:
+#         for region in row["areas"]:
+#             rgn = region["name"]
+#             countries.get(country).setdefault(rgn, [])
+#             if region["areas"]:
+#                 for city in region["areas"]:
+#                     c = city["name"]
+#                     countries.get(country).get(rgn).append(c)
+#             else:
+#                 print(f"areas is empty: {rgn}")
+#
+#     else:
+#         print(f"areas is empty: {country}")
+#
+#
+# with open('files/countries_db.json', 'w', encoding='utf-8') as f:
+#     json.dump(countries, f, indent=4, ensure_ascii=False, sort_keys=True)
 
 # db._drop_all_tables(
 #     db.connect_to_db(

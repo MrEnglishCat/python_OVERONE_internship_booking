@@ -6,8 +6,8 @@ from . import users_models
 # Create your models here.
 
 class CountryModel(models.Model):
-    name = models.CharField(max_length=100)
-    geographic_coordinates = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
+    geographic_coordinates = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -15,8 +15,8 @@ class CountryModel(models.Model):
 
 class RegionModel(models.Model):
     name = models.CharField(max_length=100)
-    geographic_coordinates = models.CharField(max_length=100)
-    country = models.ForeignKey(CountryModel, on_delete=models.DO_NOTHING)
+    geographic_coordinates = models.CharField(max_length=100, null=True, blank=True)
+    country = models.ForeignKey(CountryModel, on_delete=models.DO_NOTHING, related_name='regions')
 
     def __str__(self):
         return self.name
@@ -24,8 +24,8 @@ class RegionModel(models.Model):
 
 class CityModel(models.Model):
     name = models.CharField(max_length=100)
-    geographic_coordinates = models.CharField(max_length=100)
-    region = models.ForeignKey(RegionModel, on_delete=models.DO_NOTHING)
+    geographic_coordinates = models.CharField(max_length=100, null=True, blank=True)
+    region = models.ForeignKey(RegionModel, on_delete=models.DO_NOTHING, related_name='cities')
     country = models.ForeignKey(CountryModel, on_delete=models.DO_NOTHING)
 
     def __str__(self):
@@ -39,7 +39,7 @@ class StreetTypeModel(models.Model):
     проспект
     улица
     шоссе
-    другое:
+    другое:   # TODO пока что сделано без другого, все в одном
         аллея
         дорога
         дорожка
@@ -59,16 +59,19 @@ class StreetTypeModel(models.Model):
     """
     type = models.CharField(max_length=100)
 
-
-class AddressModel(models.Model):
-    street_name = models.CharField(max_length=100)
-    building = models.IntegerField()
-    corps = models.IntegerField()
-    location = models.CharField(
-        max_length=100)  # TODO почитать про задание координат в джанго, что бы можно было использовать с картами
-    street_type = models.ForeignKey(StreetTypeModel, on_delete=models.DO_NOTHING)
-
-
+    def __str__(self):
+        return self.type
+#
+#
+# class AddressModel(models.Model):
+#     street_name = models.CharField(max_length=100)
+#     building = models.IntegerField()
+#     corps = models.IntegerField()
+#     location = models.CharField(
+#         max_length=100)  # TODO почитать про задание координат в джанго, что бы можно было использовать с картами
+#     street_type = models.ForeignKey(StreetTypeModel, on_delete=models.DO_NOTHING)
+#
+#
 class BuildingGroupTypeModel(models.Model):
     """
     Номера, спальные места - в отеле, гостевом доме или хостеле - desc Гостям будет предоставлен номер в отеле, гостевом доме или спальное место в хостеле
@@ -76,11 +79,12 @@ class BuildingGroupTypeModel(models.Model):
     Дома, коттеджи - целиком - desc Гости снимут дом целиком. Вместе с пристройками
     Отдельные комнаты - целиком - desc Гости снимут отдельную комнату со спальным местом
     """
-    type = models.CharField(max_length=100)
+    type = models.CharField(max_length=100, unique=True)
+    comment = models.TextField(null=True, blank=True)
     description = models.TextField()
 
     def __str__(self):
-        return self.name
+        return self.type
 
 
 class BuildingTypeModel(models.Model):
@@ -127,24 +131,27 @@ class BuildingTypeModel(models.Model):
     name = models.CharField(max_length=100)
     group = models.ForeignKey(BuildingGroupTypeModel, on_delete=models.DO_NOTHING)
 
+    def __str__(self):
+        return f"{self.name} - {self.group}"
 
-class PropertyRoomsModel(models.Model):
-    arrival_time = models.TimeField()
-    departure_time = models.TimeField()
-    prepayment = models.FloatField()
-    minimum_length_of_stay = models.PositiveIntegerField(default=1)  # минимальный срок проживания
-
-
-# ===============================================================
-class GeneralInformationModel(models.Model):
-    room_square = models.FloatField()
-    floor = models.PositiveIntegerField()
-    floor_in_the_house = models.PositiveIntegerField()
-    count_rooms = models.PositiveIntegerField()
-    kitchen = models.CharField()  # без кухни; отдельная кухня; кухня-гостинная; кухонная зона
-    room_repair = models.CharField()  # без ремонта; косметический ремонт; евро ремонт; дизайнерский
-
-
+#
+# class PropertyRoomsModel(models.Model):
+#     arrival_time = models.TimeField()
+#     departure_time = models.TimeField()
+#     prepayment = models.FloatField()
+#     minimum_length_of_stay = models.PositiveIntegerField(default=1)  # минимальный срок проживания
+#
+#
+# # ===============================================================
+# class GeneralInformationModel(models.Model):
+#     room_square = models.FloatField()
+#     floor = models.PositiveIntegerField()
+#     floor_in_the_house = models.PositiveIntegerField()
+#     count_rooms = models.PositiveIntegerField()
+#     kitchen = models.CharField()  # без кухни; отдельная кухня; кухня-гостинная; кухонная зона
+#     room_repair = models.CharField()  # без ремонта; косметический ремонт; евро ремонт; дизайнерский
+#
+#
 class BedTypesModel(models.Model):
     """
     односпальная кровать
@@ -155,27 +162,50 @@ class BedTypesModel(models.Model):
     двухъярусная кровать
     диван кровать
     """
-    type = models.CharField(max_length=100)
-    count = models.PositiveIntegerField()
+    type = models.CharField(max_length=100, unique=True)
+    # count = models.PositiveIntegerField()  # TODO переместить в промежуточную таблицу
 
+    def __str__(self):
+        return self.type
 
-class SleepingPlacesModel(models.Model):
-    count_sleeping_places = models.PositiveIntegerField()
-    maximum_guests = models.PositiveIntegerField()
-    bed_types = models.ForeignKey(BedTypesModel, on_delete=models.DO_NOTHING)
-
-
+# TODO возможно нужна промежуточная модель многие ко многим между BedTypesModel и SleepingPlacesModel
+# class SleepingPlacesModel(models.Model):
+#     count_sleeping_places = models.PositiveIntegerField()
+#     maximum_guests = models.PositiveIntegerField()
+#     bed_types = models.ForeignKey(BedTypesModel, on_delete=models.DO_NOTHING)
+#
+#
 class BathroomAmenitiesModel(models.Model):
-    name = models.CharField(max_length=100)
+    """
+        биде
+        ванна
+        гигиенический душ
+        дополнительная ванная
+        дополнительный туалет
+        душ
+        общая ванная комната
+        общий туалет
+        полотенца
+        сауна
+        тапочки
+        туалетные принадлежности
+        фен
+        халат
+        общий душ/душевая
+    """
+    name = models.CharField(max_length=100, unique=True)
 
+    def __str__(self):
+        return self.name
 
-class BathroomModel(models.Model):
-    bathroom_with_wc = models.PositiveIntegerField()
-    bathroom_without_wc = models.PositiveIntegerField()
-    separate_wc = models.PositiveIntegerField()
-    amenities = models.ForeignKey(BathroomAmenitiesModel, on_delete=models.DO_NOTHING)
-
-
+## TODO возможно нужна промежуточная модель многие ко многим между BathroomAmenitiesModel и BathroomModel
+# class BathroomModel(models.Model):
+#     bathroom_with_wc = models.PositiveIntegerField()
+#     bathroom_without_wc = models.PositiveIntegerField()
+#     separate_wc = models.PositiveIntegerField()
+#     amenities = models.ForeignKey(BathroomAmenitiesModel, on_delete=models.DO_NOTHING)
+#
+#
 class CategoriesAmenitiesModel(models.Model):
     """
     Удобства
@@ -189,73 +219,79 @@ class CategoriesAmenitiesModel(models.Model):
     Инфраструктура и досуг рядом
     Для детей
     """
-    title = models.CharField(max_length=100)
-    description = models.TextField()
+    title = models.CharField(max_length=100, unique=True)
+    description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.title
 
-
-# class ParkingAmenitiesModel(models.Model):  # TODO в последствии добавить такой вариант
-#     type = models.CharField(max_length=100)
 #
-
+# # class ParkingAmenitiesModel(models.Model):  # TODO в последствии добавить такой вариант удобства как пароковка
+# #     type = models.CharField(max_length=100)
+# #
+#
 class AmenitiesModel(models.Model):  # Amenities - удобства
     """
+
     """
-    name = models.CharField(max_length=100)
-    description = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
+    description = models.CharField(max_length=100, null=True, blank=True)
     category = models.ForeignKey(CategoriesAmenitiesModel, on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return self.name
+#
+#
+# class ImageUrlsModel(models.Model):
+#     url = models.URLField()
+#
+#
+# class PlacingRulesModel(models.Model):
+#     # TODO всем полям ниже нужны значения по умолчанию в select
+#     with_children = models.BooleanField()
+#     age = models.PositiveIntegerField()
+#     with_animals = models.BooleanField()
+#     smoking_is_allowed = models.BooleanField()
+#     parties_are_allowed = models.BooleanField()
+#
+#
+# class ArrivalsDepartueModel(models.Model):
+#     arrival_time = models.TimeField()
+#     departure_time = models.TimeField()
+#
+#
+# class PricesModel(models.Model):
+#     currency_for_calculations = models.CharField()
+#     min_rental_period = models.CharField()  # TODO если не получится с датой, то использовать integerField
+#     price_per_day = models.FloatField()
+#     how_many_guests = models.PositiveIntegerField()
+#
+#
+# class SalesModel(models.Model):
+#     type_sales = models.CharField()
+#     value = models.FloatField()
+#     from_days = models.CharField()  # TODO добавить виджет select
+#
+#
 
-
-class ImageUrlsModel(models.Model):
-    url = models.URLField()
-
-
-class PlacingRulesModel(models.Model):
-    # TODO всем полям ниже нужны значения по умолчанию в select
-    with_children = models.BooleanField()
-    age = models.PositiveIntegerField()
-    with_animals = models.BooleanField()
-    smoking_is_allowed = models.BooleanField()
-    parties_are_allowed = models.BooleanField()
-
-
-class ArrivalsDepartueModel(models.Model):
-    arrival_time = models.TimeField()
-    departure_time = models.TimeField()
-
-
-class PricesModel(models.Model):
-    currency_for_calculations = models.CharField()
-    min_rental_period = models.CharField()  # TODO если не получится с датой, то использовать integerField
-    price_per_day = models.FloatField()
-    how_many_guests = models.PositiveIntegerField()
-
-
-class SalesModel(models.Model):
-    type_sales = models.CharField()
-    value = models.FloatField()
-    from_days = models.CharField()  # TODO добавить виджет select
-
-
-class RoomModel(models.Model):
+class ObjectRoomModel(models.Model):
     title = models.CharField(max_length=100)
-    images_urls = models.ForeignKey(ImageUrlsModel,
-                                    on_delete=models.DO_NOTHING)  # хранение адресов на изображения. Разделитель: ","
-    # TODO рассмотреть возможность сделать зависимость параметров от типа строения
-    # TODO СУПЕРХОЗЯИН ГОСТИ РЕКОМЕНДУЮТ 9.9 (12 отзывов) - добавить рейтинг, отзывы. Отобразить количество отзывов
+#     images_urls = models.ForeignKey(ImageUrlsModel,
+#                                     on_delete=models.DO_NOTHING)  # хранение адресов на изображения. Разделитель: ","
+#     # TODO рассмотреть возможность сделать зависимость параметров от типа строения
+#     # TODO СУПЕРХОЗЯИН ГОСТИ РЕКОМЕНДУЮТ 9.9 (12 отзывов) - добавить рейтинг, отзывы. Отобразить количество отзывов
     buildind_description = models.TextField()
-
-    placing_rules = models.ForeignKey(PlacingRulesModel, on_delete=models.DO_NOTHING)
-    arrival_departure = models.ForeignKey(ArrivalsDepartueModel, on_delete=models.DO_NOTHING)
-    prepayment = models.FloatField()  # persent default 20%
-    price_data = models.ForeignKey(PricesModel, on_delete=models.DO_NOTHING)
-    sales = models.ForeignKey(SalesModel, on_delete=models.DO_NOTHING)
-
+#
+#     placing_rules = models.ForeignKey(PlacingRulesModel, on_delete=models.DO_NOTHING)
+#     arrival_departure = models.ForeignKey(ArrivalsDepartueModel, on_delete=models.DO_NOTHING)
+    prepayment = models.FloatField(default=0.0)  # persent default 20%   default_currency = BYN
+    # default_currency = models.
+#     price_data = models.ForeignKey(PricesModel, on_delete=models.DO_NOTHING)
+#     sales = models.ForeignKey(SalesModel, on_delete=models.DO_NOTHING)
+#
     type = models.ForeignKey(BuildingTypeModel, on_delete=models.DO_NOTHING)
     city = models.ForeignKey(CityModel, on_delete=models.DO_NOTHING)
-    user = models.ForeignKey(users_models.UserModel, on_delete=models.DO_NOTHING)
+#     user = models.ForeignKey(users_models.UserModel, on_delete=models.DO_NOTHING)
+
+    def __str__(self):
+        return self.title
