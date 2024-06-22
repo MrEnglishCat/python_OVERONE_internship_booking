@@ -34,15 +34,15 @@ class StreetTypeAdmin(admin.ModelAdmin):
 @admin.register(models.BuildingGroupTypeModel)
 class BuildingGroupTypeAdmin(admin.ModelAdmin):
     # list_display = ('id', 'name')
-    search_fields = ('id', 'type')
+    search_fields = ('id', 'building_group_type')
     list_select_related = True
 
 @admin.register(models.BuildingTypeModel)
 class BuildingTypeModelAdmin(admin.ModelAdmin):
     # list_display = ('id', 'name')
-    search_fields = ('id', 'name')
-    autocomplete_fields = ('group', )
-    raw_id_fields = ('group',)
+    search_fields = ('id', 'name', 'building_type_group')
+    autocomplete_fields = ('building_type_group',)
+    raw_id_fields = ('building_type_group',)
     list_select_related = True
 
 
@@ -50,6 +50,6 @@ class BuildingTypeModelAdmin(admin.ModelAdmin):
 class ObjectRoomModel(admin.ModelAdmin):
     # list_display = ('id', 'name')
     # search_fields = ('id', 'name')
-    autocomplete_fields = ('city', 'type', )
-    raw_id_fields = ('city', 'type')
+    autocomplete_fields = ('city', 'building_info', )
+    raw_id_fields = ('city', 'building_info')
     # list_select_related = True

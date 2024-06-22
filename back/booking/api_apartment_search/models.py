@@ -1,13 +1,17 @@
 from django.db import models
 from django.contrib.auth.models import User
 from . import users_models
-
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 # Create your models here.
 
 class CountryModel(models.Model):
     name = models.CharField(max_length=100, unique=True)
     geographic_coordinates = models.CharField(max_length=100, null=True, blank=True)
+
+    class Meta:
+        verbose_name_plural = 'Страны'
+        verbose_name = 'Страна'
 
     def __str__(self):
         return self.name
@@ -18,8 +22,9 @@ class RegionModel(models.Model):
     geographic_coordinates = models.CharField(max_length=100, null=True, blank=True)
     country = models.ForeignKey(CountryModel, on_delete=models.DO_NOTHING, related_name='regions')
 
+
     def __str__(self):
-        return self.name
+        return f"{self.name} - {self.country}"
 
 
 class CityModel(models.Model):
@@ -29,7 +34,7 @@ class CityModel(models.Model):
     country = models.ForeignKey(CountryModel, on_delete=models.DO_NOTHING)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} - {self.country}"
 
 
 class StreetTypeModel(models.Model):
@@ -57,7 +62,7 @@ class StreetTypeModel(models.Model):
         тупик
 
     """
-    type = models.CharField(max_length=100)
+    street_type = models.CharField(max_length=100)
 
     def __str__(self):
         return self.type
@@ -79,7 +84,7 @@ class BuildingGroupTypeModel(models.Model):
     Дома, коттеджи - целиком - desc Гости снимут дом целиком. Вместе с пристройками
     Отдельные комнаты - целиком - desc Гости снимут отдельную комнату со спальным местом
     """
-    type = models.CharField(max_length=100, unique=True)
+    building_group_type = models.CharField(max_length=100, unique=True)
     comment = models.TextField(null=True, blank=True)
     description = models.TextField()
 
@@ -128,8 +133,8 @@ class BuildingTypeModel(models.Model):
         Комната в частном доме
         Комната в коттедже
     """
-    name = models.CharField(max_length=100)
-    group = models.ForeignKey(BuildingGroupTypeModel, on_delete=models.DO_NOTHING)
+    building_type_name = models.CharField(max_length=100)
+    building_type_group = models.ForeignKey(BuildingGroupTypeModel, on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return f"{self.name} - {self.group}"
@@ -162,7 +167,7 @@ class BedTypesModel(models.Model):
     двухъярусная кровать
     диван кровать
     """
-    type = models.CharField(max_length=100, unique=True)
+    bed_type = models.CharField(max_length=100, unique=True)
     # count = models.PositiveIntegerField()  # TODO переместить в промежуточную таблицу
 
     def __str__(self):
@@ -193,7 +198,7 @@ class BathroomAmenitiesModel(models.Model):
         халат
         общий душ/душевая
     """
-    name = models.CharField(max_length=100, unique=True)
+    bathroom_amenities_name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
@@ -219,8 +224,8 @@ class CategoriesAmenitiesModel(models.Model):
     Инфраструктура и досуг рядом
     Для детей
     """
-    title = models.CharField(max_length=100, unique=True)
-    description = models.TextField(null=True, blank=True)
+    categories_amenities_title = models.CharField(max_length=100, unique=True)
+    categories_amenities_description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -234,9 +239,9 @@ class AmenitiesModel(models.Model):  # Amenities - удобства
     """
 
     """
-    name = models.CharField(max_length=100, unique=True)
-    description = models.CharField(max_length=100, null=True, blank=True)
-    category = models.ForeignKey(CategoriesAmenitiesModel, on_delete=models.DO_NOTHING)
+    amenities_name = models.CharField(max_length=100, unique=True)
+    amenities_description = models.CharField(max_length=100, null=True, blank=True)
+    amenities_category = models.ForeignKey(CategoriesAmenitiesModel, on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return self.name
@@ -280,7 +285,7 @@ class ObjectRoomModel(models.Model):
 #                                     on_delete=models.DO_NOTHING)  # хранение адресов на изображения. Разделитель: ","
 #     # TODO рассмотреть возможность сделать зависимость параметров от типа строения
 #     # TODO СУПЕРХОЗЯИН ГОСТИ РЕКОМЕНДУЮТ 9.9 (12 отзывов) - добавить рейтинг, отзывы. Отобразить количество отзывов
-    buildind_description = models.TextField()
+    building_description = models.TextField()
 #
 #     placing_rules = models.ForeignKey(PlacingRulesModel, on_delete=models.DO_NOTHING)
 #     arrival_departure = models.ForeignKey(ArrivalsDepartueModel, on_delete=models.DO_NOTHING)
@@ -289,7 +294,11 @@ class ObjectRoomModel(models.Model):
 #     price_data = models.ForeignKey(PricesModel, on_delete=models.DO_NOTHING)
 #     sales = models.ForeignKey(SalesModel, on_delete=models.DO_NOTHING)
 #
-    type = models.ForeignKey(BuildingTypeModel, on_delete=models.DO_NOTHING)
+    # TODO разобраться с подсчетом рейтинга и как его хранить
+    rating = models.FloatField(validators=(MinValueValidator(0.0), MaxValueValidator(5.0)), default=0.0)
+    votes = models.PositiveBigIntegerField(default=0)
+    rating_sum = models.FloatField(default=0)
+    building_info = models.ForeignKey(BuildingTypeModel, on_delete=models.DO_NOTHING)
     city = models.ForeignKey(CityModel, on_delete=models.DO_NOTHING)
 #     user = models.ForeignKey(users_models.UserModel, on_delete=models.DO_NOTHING)
 
