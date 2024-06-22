@@ -34,13 +34,13 @@ class StreetTypeAdmin(admin.ModelAdmin):
 @admin.register(models.BuildingGroupTypeModel)
 class BuildingGroupTypeAdmin(admin.ModelAdmin):
     # list_display = ('id', 'name')
-    search_fields = ('id', 'building_group_type')
+    search_fields = ('id', 'building_type_name')
     list_select_related = True
 
 @admin.register(models.BuildingTypeModel)
 class BuildingTypeModelAdmin(admin.ModelAdmin):
     # list_display = ('id', 'name')
-    search_fields = ('id', 'name', 'building_type_group')
+    search_fields = ('id', 'building_type_name', 'building_type_group__building_group_type')
     autocomplete_fields = ('building_type_group',)
     raw_id_fields = ('building_type_group',)
     list_select_related = True

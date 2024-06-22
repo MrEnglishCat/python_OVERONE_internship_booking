@@ -65,7 +65,7 @@ class StreetTypeModel(models.Model):
     street_type = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.type
+        return self.street_type
 #
 #
 # class AddressModel(models.Model):
@@ -89,7 +89,7 @@ class BuildingGroupTypeModel(models.Model):
     description = models.TextField()
 
     def __str__(self):
-        return self.type
+        return self.building_group_type
 
 
 class BuildingTypeModel(models.Model):
@@ -137,7 +137,7 @@ class BuildingTypeModel(models.Model):
     building_type_group = models.ForeignKey(BuildingGroupTypeModel, on_delete=models.DO_NOTHING)
 
     def __str__(self):
-        return f"{self.name} - {self.group}"
+        return f"{self.building_type_name} - {self.building_type_group}"
 
 #
 # class PropertyRoomsModel(models.Model):
@@ -171,7 +171,7 @@ class BedTypesModel(models.Model):
     # count = models.PositiveIntegerField()  # TODO переместить в промежуточную таблицу
 
     def __str__(self):
-        return self.type
+        return self.bed_type
 
 # TODO возможно нужна промежуточная модель многие ко многим между BedTypesModel и SleepingPlacesModel
 # class SleepingPlacesModel(models.Model):
@@ -201,7 +201,7 @@ class BathroomAmenitiesModel(models.Model):
     bathroom_amenities_name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
-        return self.name
+        return self.bathroom_amenities_name
 
 ## TODO возможно нужна промежуточная модель многие ко многим между BathroomAmenitiesModel и BathroomModel
 # class BathroomModel(models.Model):
@@ -228,7 +228,7 @@ class CategoriesAmenitiesModel(models.Model):
     categories_amenities_description = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return self.title
+        return self.categories_amenities_title
 
 #
 # # class ParkingAmenitiesModel(models.Model):  # TODO в последствии добавить такой вариант удобства как пароковка
@@ -244,7 +244,7 @@ class AmenitiesModel(models.Model):  # Amenities - удобства
     amenities_category = models.ForeignKey(CategoriesAmenitiesModel, on_delete=models.DO_NOTHING)
 
     def __str__(self):
-        return self.name
+        return self.amenities_name
 #
 #
 # class ImageUrlsModel(models.Model):
