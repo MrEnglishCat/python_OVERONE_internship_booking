@@ -35,6 +35,8 @@ class SearchMainPageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         search = self.request.query_params.get('search', None)
+        if not search:
+            return models.ObjectRoomModel.objects.none()
         result = models.ObjectRoomModel.objects.select_related('city', 'building_info').filter(
             Q(title__contains=search) | Q(city__name=search)).annotate(count=Count(
             'title')).annotate(ratingsssss=ExpressionWrapper(F('rating_sum') / NullIf(F('votes'), 0), output_field=FloatField()))  # | ( Q(country__name=search) | Q(region__name=search) = добавить поиск по курорту, адресу

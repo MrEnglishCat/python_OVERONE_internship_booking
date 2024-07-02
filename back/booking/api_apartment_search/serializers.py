@@ -28,17 +28,22 @@ class CitySerializer(serializers.ModelSerializer):
 
 class BuildingTypeSerializer(serializers.ModelSerializer):
     building_type_group = serializers.CharField(source='building_type_group.building_group_type')
-    
     class Meta:
         model = models.BuildingTypeModel
         fields = ('building_type_name', 'building_type_group')
         read_only_fields = ('building_type_name', 'building_type_group')
+
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ImageUrlsModel
+        fields = '__all__'
 
 
 class ObjectRoomSerializer(serializers.ModelSerializer):
     city = CitySerializer(read_only=True)
     building_info = BuildingTypeSerializer(read_only=True)
 
+    images_path = ImageSerializer(read_only=True, many=True)
     class Meta:
         model = models.ObjectRoomModel
         fields = '__all__'

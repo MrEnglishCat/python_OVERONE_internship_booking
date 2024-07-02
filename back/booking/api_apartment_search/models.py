@@ -1,7 +1,10 @@
+from datetime import timezone, datetime
+
 from django.db import models
 from django.contrib.auth.models import User
 from . import users_models
 from django.core.validators import MaxValueValidator, MinValueValidator
+
 
 # Create your models here.
 
@@ -10,6 +13,7 @@ class CountryModel(models.Model):
     geographic_coordinates = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
+        db_table = '"api_countries"'
         verbose_name_plural = 'Страны'
         verbose_name = 'Страна'
 
@@ -22,6 +26,8 @@ class RegionModel(models.Model):
     geographic_coordinates = models.CharField(max_length=100, null=True, blank=True)
     country = models.ForeignKey(CountryModel, on_delete=models.DO_NOTHING, related_name='regions')
 
+    class Meta:
+        db_table = '"api_regions"'
 
     def __str__(self):
         return f"{self.name} - {self.country}"
@@ -32,6 +38,9 @@ class CityModel(models.Model):
     geographic_coordinates = models.CharField(max_length=100, null=True, blank=True)
     region = models.ForeignKey(RegionModel, on_delete=models.DO_NOTHING, related_name='cities')
     country = models.ForeignKey(CountryModel, on_delete=models.DO_NOTHING)
+
+    class Meta:
+        db_table = '"api_cities"'
 
     def __str__(self):
         return f"{self.name} - {self.country}"
@@ -64,8 +73,13 @@ class StreetTypeModel(models.Model):
     """
     street_type = models.CharField(max_length=100)
 
+    class Meta:
+        db_table = '"api_streettypes"'
+
     def __str__(self):
         return self.street_type
+
+
 #
 #
 # class AddressModel(models.Model):
@@ -87,6 +101,9 @@ class BuildingGroupTypeModel(models.Model):
     building_group_type = models.CharField(max_length=100, unique=True)
     comment = models.TextField(null=True, blank=True)
     description = models.TextField()
+
+    class Meta:
+        db_table = '"api_buildinggrouptypes"'
 
     def __str__(self):
         return self.building_group_type
@@ -136,8 +153,12 @@ class BuildingTypeModel(models.Model):
     building_type_name = models.CharField(max_length=100)
     building_type_group = models.ForeignKey(BuildingGroupTypeModel, on_delete=models.DO_NOTHING)
 
+    class Meta:
+        db_table = '"api_buildingtype"'
+
     def __str__(self):
         return f"{self.building_type_name} - {self.building_type_group}"
+
 
 #
 # class PropertyRoomsModel(models.Model):
@@ -168,10 +189,15 @@ class BedTypesModel(models.Model):
     диван кровать
     """
     bed_type = models.CharField(max_length=100, unique=True)
+
     # count = models.PositiveIntegerField()  # TODO переместить в промежуточную таблицу
+
+    class Meta:
+        db_table = '"api_bedtypes"'
 
     def __str__(self):
         return self.bed_type
+
 
 # TODO возможно нужна промежуточная модель многие ко многим между BedTypesModel и SleepingPlacesModel
 # class SleepingPlacesModel(models.Model):
@@ -200,8 +226,12 @@ class BathroomAmenitiesModel(models.Model):
     """
     bathroom_amenities_name = models.CharField(max_length=100, unique=True)
 
+    class Meta:
+        db_table = '"api_bathroomamenities"'
+
     def __str__(self):
         return self.bathroom_amenities_name
+
 
 ## TODO возможно нужна промежуточная модель многие ко многим между BathroomAmenitiesModel и BathroomModel
 # class BathroomModel(models.Model):
@@ -227,8 +257,12 @@ class CategoriesAmenitiesModel(models.Model):
     categories_amenities_title = models.CharField(max_length=100, unique=True)
     categories_amenities_description = models.TextField(null=True, blank=True)
 
+    class Meta:
+        db_table = '"api_categoriesamenities"'
+
     def __str__(self):
         return self.categories_amenities_title
+
 
 #
 # # class ParkingAmenitiesModel(models.Model):  # TODO в последствии добавить такой вариант удобства как пароковка
@@ -243,12 +277,34 @@ class AmenitiesModel(models.Model):  # Amenities - удобства
     amenities_description = models.CharField(max_length=100, null=True, blank=True)
     amenities_category = models.ForeignKey(CategoriesAmenitiesModel, on_delete=models.DO_NOTHING)
 
+    class Meta:
+        db_table = '"api_amenities"'
+
     def __str__(self):
         return self.amenities_name
-#
-#
-# class ImageUrlsModel(models.Model):
-#     url = models.URLField()
+
+
+class ImageUrlsModel(models.Model):
+    # image_path_url = models.ImageField(upload_to='images/')
+    image_path_url = models.CharField(max_length=100, unique=True)
+    # object_room = models.ForeignKey('ObjectRoomModel', on_delete=models.DO_NOTHING)
+
+    class Meta:
+        db_table = '"api_imageurls"'
+
+
+    def __str__(self):
+        return self.image_path_url
+
+
+class ImageConnectorModel(models.Model):
+    image_urls = models.ForeignKey(ImageUrlsModel, on_delete=models.DO_NOTHING)
+    object_room = models.ForeignKey('ObjectRoomModel', on_delete=models.DO_NOTHING)
+
+    class Meta:
+        db_table = '"api_imageconnectors"'
+
+
 #
 #
 # class PlacingRulesModel(models.Model):
@@ -281,26 +337,33 @@ class AmenitiesModel(models.Model):  # Amenities - удобства
 
 class ObjectRoomModel(models.Model):
     title = models.CharField(max_length=100)
-#     images_urls = models.ForeignKey(ImageUrlsModel,
-#                                     on_delete=models.DO_NOTHING)  # хранение адресов на изображения. Разделитель: ","
-#     # TODO рассмотреть возможность сделать зависимость параметров от типа строения
-#     # TODO СУПЕРХОЗЯИН ГОСТИ РЕКОМЕНДУЮТ 9.9 (12 отзывов) - добавить рейтинг, отзывы. Отобразить количество отзывов
+    # images_path = models.ForeignKey(ImageConnectorModel,
+    #                                 on_delete=models.DO_NOTHING, null=True,
+    #                                 blank=True)  # хранение адресов на изображения. Разделитель: ","
+    #     # TODO рассмотреть возможность сделать зависимость параметров от типа строения
+    #     # TODO СУПЕРХОЗЯИН ГОСТИ РЕКОМЕНДУЮТ 9.9 (12 отзывов) - добавить рейтинг, отзывы. Отобразить количество отзывов
     building_description = models.TextField()
-#
-#     placing_rules = models.ForeignKey(PlacingRulesModel, on_delete=models.DO_NOTHING)
-#     arrival_departure = models.ForeignKey(ArrivalsDepartueModel, on_delete=models.DO_NOTHING)
+    #
+    #     placing_rules = models.ForeignKey(PlacingRulesModel, on_delete=models.DO_NOTHING)
+    #     arrival_departure = models.ForeignKey(ArrivalsDepartueModel, on_delete=models.DO_NOTHING)
     prepayment = models.FloatField(default=0.0)  # persent default 20%   default_currency = BYN
     # default_currency = models.
-#     price_data = models.ForeignKey(PricesModel, on_delete=models.DO_NOTHING)
-#     sales = models.ForeignKey(SalesModel, on_delete=models.DO_NOTHING)
-#
+    #     price_data = models.ForeignKey(PricesModel, on_delete=models.DO_NOTHING)
+    #     sales = models.ForeignKey(SalesModel, on_delete=models.DO_NOTHING)
+    #
     # TODO разобраться с подсчетом рейтинга и как его хранить
     rating = models.FloatField(validators=(MinValueValidator(0.0), MaxValueValidator(5.0)), default=0.0)
     votes = models.PositiveBigIntegerField(default=0)
     rating_sum = models.FloatField(default=0)
     building_info = models.ForeignKey(BuildingTypeModel, on_delete=models.DO_NOTHING)
     city = models.ForeignKey(CityModel, on_delete=models.DO_NOTHING)
-#     user = models.ForeignKey(users_models.UserModel, on_delete=models.DO_NOTHING)
+
+    # user = models.ForeignKey(users_models.UserModel, on_delete=models.DO_NOTHING)
+    create_datetime = models.DateTimeField(auto_now_add=True)
+    update_datetime = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    class Meta:
+        db_table = '"api_objectrooms"'
 
     def __str__(self):
         return self.title

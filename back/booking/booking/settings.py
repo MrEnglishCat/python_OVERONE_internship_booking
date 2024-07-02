@@ -26,8 +26,9 @@ SECRET_KEY = 'django-insecure-h62tuv@-o!)@xdcbh67uq9t!w6k@c90ovoxnquxzo&n1k)ez!b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*' if DEBUG else '']
-
+# ALLOWED_HOSTS = ['*' if DEBUG else '']
+ALLOWED_HOSTS = ['*']
+CORS_ALLOW_ALL_ORIGINS = True
 # Application definition
 
 INSTALLED_APPS = [
@@ -138,6 +139,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
