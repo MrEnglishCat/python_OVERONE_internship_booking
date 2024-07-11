@@ -46,9 +46,20 @@ class BuildingTypeModelAdmin(admin.ModelAdmin):
     list_select_related = True
 
 
+@admin.register(models.GeneralInformationModel)
+class GeneralInformationModelAdmin(admin.ModelAdmin):
+    list_select_related = True
+    search_fields = ('id', 'general_information')
+
+
+
+@admin.register(models.PlacingRulesModel)
+class PlacingRulesAdmin(admin.ModelAdmin):
+    list_select_related = True
+
 @admin.register(models.ObjectRoomModel)
 class ObjectRoomModel(admin.ModelAdmin):
-    list_display = ('id', 'title', 'create_datetime', 'update_datetime')
+    list_display = ('id', 'title', 'create_datetime', 'update_datetime', 'city')
 
     list_display_links = ('title',)
     search_fields = ('id', 'title')

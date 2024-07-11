@@ -1,4 +1,5 @@
-from datetime import timezone, datetime
+import time
+from datetime import timezone, datetime, timedelta
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -160,24 +161,61 @@ class BuildingTypeModel(models.Model):
         return f"{self.building_type_name} - {self.building_type_group}"
 
 
-#
-# class PropertyRoomsModel(models.Model):
-#     arrival_time = models.TimeField()
-#     departure_time = models.TimeField()
-#     prepayment = models.FloatField()
-#     minimum_length_of_stay = models.PositiveIntegerField(default=1)  # минимальный срок проживания
-#
-#
+
 # # ===============================================================
-# class GeneralInformationModel(models.Model):
-#     room_square = models.FloatField()
-#     floor = models.PositiveIntegerField()
-#     floor_in_the_house = models.PositiveIntegerField()
-#     count_rooms = models.PositiveIntegerField()
-#     kitchen = models.CharField()  # без кухни; отдельная кухня; кухня-гостинная; кухонная зона
-#     room_repair = models.CharField()  # без ремонта; косметический ремонт; евро ремонт; дизайнерский
-#
-#
+
+class GeneralInformationModel(models.Model):
+
+    WITHOUT_KITCHEN = 'без кухни'
+    SEPARATE_KITCHEN = 'отдельная кухня'
+    KITCHEN_LIVING_ROOM = 'кухня-гостинная'
+    KITCHEN_AREA = 'кухонная зона'
+
+    KITCHEN_CHOICES = (
+        (WITHOUT_KITCHEN, 'без кухни'),
+        (SEPARATE_KITCHEN, 'отдельная кухня'),
+        (KITCHEN_LIVING_ROOM, 'кухня-гостинная'),
+        (KITCHEN_AREA, 'кухонная зона'),
+    )
+
+    WITHOUT_REPAIR = 'без ремонта'
+    REDECORATING = 'косметический ремонт'
+    EURO_RENOVATION = 'евро ремонт'
+    DESIGNER = 'дизайнерский'
+
+    REPAIR_CHOICES = (
+        (WITHOUT_REPAIR, 'без ремонта'),
+        (REDECORATING, 'косметический ремонт'),
+        (EURO_RENOVATION, 'евро ремонт'),
+        (DESIGNER, 'дизайнерский'),
+    )
+    # payment_method = models.CharField(
+    #     'payment method',
+    #     choices=PAYMENT_METHOD_CHOICES,
+    #     default=CASH
+    # )
+
+    room_square = models.FloatField()
+    floor = models.PositiveIntegerField()
+    floor_in_the_house = models.PositiveIntegerField()
+    count_rooms = models.PositiveIntegerField()
+    kitchen = models.CharField(
+        'kitchen',
+        choices=KITCHEN_CHOICES,
+        default=WITHOUT_KITCHEN,
+    )  # без кухни; отдельная кухня; кухня-гостинная; кухонная зона
+    room_repair = models.CharField(
+        'room repair',
+        choices=REPAIR_CHOICES,
+        default=WITHOUT_REPAIR,
+    )  # без ремонта; косметический ремонт; евро ремонт; дизайнерский
+
+    class Meta:
+        db_table = '"api_general_info"'
+
+    def __str__(self):
+        return f"{self.id}"
+
 class BedTypesModel(models.Model):
     """
     односпальная кровать
@@ -307,14 +345,17 @@ class ImageConnectorModel(models.Model):
 
 #
 #
-# class PlacingRulesModel(models.Model):
-#     # TODO всем полям ниже нужны значения по умолчанию в select
-#     with_children = models.BooleanField()
-#     age = models.PositiveIntegerField()
-#     with_animals = models.BooleanField()
-#     smoking_is_allowed = models.BooleanField()
-#     parties_are_allowed = models.BooleanField()
-#
+class PlacingRulesModel(models.Model):
+    # TODO всем полям ниже нужны значения по умолчанию в select
+    with_children = models.BooleanField(default=False)
+    age = models.PositiveIntegerField(default=0)
+    with_animals = models.BooleanField(default=False)
+    smoking_is_allowed = models.BooleanField(default=False)
+    parties_are_allowed = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = '"api_placingrules"'
+
 #
 # class ArrivalsDepartueModel(models.Model):
 #     arrival_time = models.TimeField()
@@ -336,6 +377,18 @@ class ImageConnectorModel(models.Model):
 #
 
 class ObjectRoomModel(models.Model):
+
+    CREDIT_CARD = 'Картой'
+    CASH = 'Наличными'
+    WIRE_TRANSFER = 'Перевод'
+
+    PAYMENT_METHOD_CHOICES = [
+        (CREDIT_CARD, 'Картой'),
+        (CASH, 'Наличными'),
+        (WIRE_TRANSFER, 'Перевод'),
+    ]
+
+
     title = models.CharField(max_length=100)
     # images_path = models.ForeignKey(ImageConnectorModel,
     #                                 on_delete=models.DO_NOTHING, null=True,
@@ -347,20 +400,34 @@ class ObjectRoomModel(models.Model):
     #     placing_rules = models.ForeignKey(PlacingRulesModel, on_delete=models.DO_NOTHING)
     #     arrival_departure = models.ForeignKey(ArrivalsDepartueModel, on_delete=models.DO_NOTHING)
     prepayment = models.FloatField(default=0.0)  # persent default 20%   default_currency = BYN
-    # default_currency = models.
-    #     price_data = models.ForeignKey(PricesModel, on_delete=models.DO_NOTHING)
+    payment_method = models.CharField(
+        'payment method',
+        choices=PAYMENT_METHOD_CHOICES,
+        default=CASH
+    )
+    arrival_time = models.TimeField(default=datetime.now().strftime('%H:%M'))
+    departure_time = models.TimeField(default=(datetime.now() + timedelta(hours=1)).strftime('%H:%M'))
+    minimum_length_of_stay = models.PositiveIntegerField(default=1)  # минимальный срок проживания
+
+    placing_rules = models.ForeignKey(PlacingRulesModel, on_delete=models.CASCADE, null=True, blank=True)
+    price = models.FloatField(default=0.0)
     #     sales = models.ForeignKey(SalesModel, on_delete=models.DO_NOTHING)
     #
-    # TODO разобраться с подсчетом рейтинга и как его хранить
-    rating = models.FloatField(validators=(MinValueValidator(0.0), MaxValueValidator(5.0)), default=0.0)
+
+    general_info = models.ForeignKey(GeneralInformationModel, on_delete=models.CASCADE, null=True, blank=True)
+    # TODO в дальнейшем добавить возможность оценивать разные показатели и выводить среднее значение между всеми показателями
+    rating = models.DecimalField(default=0, decimal_places=4, max_digits=7, validators=(MinValueValidator(0.0), MaxValueValidator(10.0)))  # TODO рассмотреть в дальнешем вынести оценку в отдельную таблицу с большим количеством критериев
     votes = models.PositiveBigIntegerField(default=0)
-    rating_sum = models.FloatField(default=0)
+    rating_sum = models.DecimalField(default=0, decimal_places=4, max_digits=7)
     building_info = models.ForeignKey(BuildingTypeModel, on_delete=models.DO_NOTHING)
+
     city = models.ForeignKey(CityModel, on_delete=models.DO_NOTHING)
 
     # user = models.ForeignKey(users_models.UserModel, on_delete=models.DO_NOTHING)
     create_datetime = models.DateTimeField(auto_now_add=True)
     update_datetime = models.DateTimeField(auto_now=True, null=True, blank=True)
+    is_published = models.BooleanField(default=False, )
+
 
     class Meta:
         db_table = '"api_objectrooms"'
