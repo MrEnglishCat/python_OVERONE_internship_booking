@@ -58,11 +58,11 @@ class UpdateRatingObjectSerializer(serializers.ModelSerializer):
         )
 
 
-
 class PlasingRulesSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.PlacingRulesModel
         fields = '__all__'
+
 
 class ObjectRoomSerializer(serializers.ModelSerializer):
     city = CitySerializer(read_only=True)
@@ -71,6 +71,7 @@ class ObjectRoomSerializer(serializers.ModelSerializer):
     general_info = GeneralInformationSerializer(read_only=True)
     images_path = ImageSerializer(read_only=True, many=True)
     placing_rules = PlasingRulesSerializer(read_only=True)
+
     class Meta:
         model = models.ObjectRoomModel
 

@@ -434,3 +434,10 @@ class ObjectRoomModel(models.Model):
 
     def __str__(self):
         return self.title
+
+
+# class IssuedJWTTokenModel(models.Model):
+#     jti = models.CharField(max_length=36, unique=True, primary_key=True)
+#     subject = models.ForeignKey("APIUserModel", on_delete=models.CASCADE, related_name='tokens')
+#     revoked = models.BooleanField(default=False)
+#

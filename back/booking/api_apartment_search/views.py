@@ -63,11 +63,14 @@ class SearchMainPageViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.ObjectRoomSerializer
     filter_backends = [filters.SearchFilter]
     # search_fields = ['country', 'region', 'city', 'name']
-    search_fields = ['title', 'city__name']
+    search_fields = ['title', 'city__name', 'city__country__name']
 
     def get_queryset(self):
+
         pk = self.kwargs.get('pk', None)
+
         if pk and pk.isdigit():
+
             result = models.ObjectRoomModel.objects.filter(pk=int(pk))
             if result:
                 return result
@@ -78,10 +81,13 @@ class SearchMainPageViewSet(viewsets.ReadOnlyModelViewSet):
             search = self.request.query_params.get('search', None)
             if not search:
                 return models.ObjectRoomModel.objects.none()
-            result = models.ObjectRoomModel.objects.select_related('city', 'building_info').filter(
-                Q(title__contains=search) | Q(city__name=search) & Q(is_published=True)).annotate(count=Count(
-                'title')).annotate(ratingsssss=ExpressionWrapper(F('rating_sum') / NullIf(F('votes'), 0),
-                                                                 output_field=FloatField()))  # | ( Q(country__name=search) | Q(region__name=search) = добавить поиск по курорту, адресу
+
+            result = models.ObjectRoomModel.objects.select_related('city', 'building_info', 'general_info').filter(
+                Q(title__icontains=search) | Q(city__name__icontains=search) | Q(city__country__name__icontains=search) & Q(is_published=True)) #.annotate(count=Count(
+                #'title')).annotate(ratingsssss=ExpressionWrapper(F('rating_sum') / NullIf(F('votes'), 0),
+                #
+                #
+                #                                             output_field=FloatField()))  # | ( Q(country__name=search) | Q(region__name=search) = добавить поиск по курорту, адресу
 
             return result
         else:
