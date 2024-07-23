@@ -9,8 +9,6 @@ from rest_framework.views import APIView, exception_handler
 from . import models
 from . import serializers
 
-from decimal import Decimal
-
 
 # Create your views here.
 
@@ -83,14 +81,16 @@ class SearchMainPageViewSet(viewsets.ReadOnlyModelViewSet):
                 return models.ObjectRoomModel.objects.none()
 
             result = models.ObjectRoomModel.objects.select_related('city', 'building_info', 'general_info').filter(
-                Q(title__icontains=search) | Q(city__name__icontains=search) | Q(city__country__name__icontains=search) & Q(is_published=True)) #.annotate(count=Count(
-                #'title')).annotate(ratingsssss=ExpressionWrapper(F('rating_sum') / NullIf(F('votes'), 0),
-                #
-                #
-                #                                             output_field=FloatField()))  # | ( Q(country__name=search) | Q(region__name=search) = добавить поиск по курорту, адресу
+                Q(title__icontains=search) | Q(city__name__icontains=search) | Q(
+                    city__country__name__icontains=search) & Q(is_published=True))  # .annotate(count=Count(
+            # 'title')).annotate(ratingsssss=ExpressionWrapper(F('rating_sum') / NullIf(F('votes'), 0),
+            #
+            #
+            #                                             output_field=FloatField()))  # | ( Q(country__name=search) | Q(region__name=search) = добавить поиск по курорту, адресу
 
             return result
         else:
             # return Response({'error': f'pk is not valid value. Need integer, but your value is {pk}'}, status=status.HTTP_400_BAD_REQUEST)
             return models.ObjectRoomModel.objects.none()
+
 

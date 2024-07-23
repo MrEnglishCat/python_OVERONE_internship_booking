@@ -1,5 +1,5 @@
 import React, {useState} from "react"
-import DirectionRouteCard from "./DirectionRouteCard";
+import DirectionRouteCard from "./Main page/DirectionRouteCard";
 
 
 const ModalSignIn = () => {

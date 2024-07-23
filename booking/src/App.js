@@ -1,13 +1,13 @@
 import './App.css';
 import React, {useState} from "react";
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
-import NavigateHeader from "./Components/NavigateHeader";
-import Footer from "./Components/Footer";
+import NavigateHeader from "./Components/General page/NavigateHeader";
+import Footer from "./Components/General page/Footer";
 import HomePage from "./Components/Main page/HomePage";
 import Search from "./Components/Search/SearchObjects";
-import Carousel from "./Components/Carousel";
+import Carousel from "./Components/Main page/Carousel";
 import DetailCard from "./Components/Search/DetailCard";
-import NotFound from "./Components/NotFound";
+import NotFound from "./Components/General page/NotFound";
 import LoginPage from "./Components/Authorization/LoginPage";
 import RegisterPage from "./Components/Authorization/RegisterPage";
 import ForgotPage from "./Components/Authorization/ForgotPage";

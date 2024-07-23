@@ -80,3 +80,9 @@ class ObjectRoomSerializer(serializers.ModelSerializer):
             "rating_sum",
             "create_datetime",
         )
+
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = "__all__"

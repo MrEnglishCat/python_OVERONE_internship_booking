@@ -6,17 +6,23 @@ from django.contrib.auth.models import User
 from . import users_models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+# для JWT-токена
+from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+
 
 # Create your models here.
 
 class CountryModel(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100, unique=True, verbose_name="Страна")
     geographic_coordinates = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
         db_table = '"api_countries"'
         verbose_name_plural = 'Страны'
-        verbose_name = 'Страна'
+        verbose_name = 'Страну'
 
     def __str__(self):
         return self.name
@@ -29,6 +35,8 @@ class RegionModel(models.Model):
 
     class Meta:
         db_table = '"api_regions"'
+        verbose_name_plural = 'Регионы'
+        verbose_name = 'Регион'
 
     def __str__(self):
         return f"{self.name} - {self.country}"
@@ -42,6 +50,8 @@ class CityModel(models.Model):
 
     class Meta:
         db_table = '"api_cities"'
+        verbose_name_plural = 'Города'
+        verbose_name = 'Город'
 
     def __str__(self):
         return f"{self.name} - {self.country}"
@@ -76,6 +86,8 @@ class StreetTypeModel(models.Model):
 
     class Meta:
         db_table = '"api_streettypes"'
+        verbose_name_plural = 'Типы улиц'
+        verbose_name = 'Тип улицы'
 
     def __str__(self):
         return self.street_type
@@ -105,6 +117,8 @@ class BuildingGroupTypeModel(models.Model):
 
     class Meta:
         db_table = '"api_buildinggrouptypes"'
+        verbose_name_plural = 'Группы строений'
+        verbose_name = 'Группа строения'
 
     def __str__(self):
         return self.building_group_type
@@ -156,16 +170,16 @@ class BuildingTypeModel(models.Model):
 
     class Meta:
         db_table = '"api_buildingtype"'
+        verbose_name_plural = 'Тип строений'
+        verbose_name = 'Тип строения'
 
     def __str__(self):
         return f"{self.building_type_name} - {self.building_type_group}"
 
 
-
 # # ===============================================================
 
 class GeneralInformationModel(models.Model):
-
     WITHOUT_KITCHEN = 'без кухни'
     SEPARATE_KITCHEN = 'отдельная кухня'
     KITCHEN_LIVING_ROOM = 'кухня-гостинная'
@@ -212,9 +226,12 @@ class GeneralInformationModel(models.Model):
 
     class Meta:
         db_table = '"api_general_info"'
+        verbose_name_plural = 'Общая информация'
+        verbose_name = 'Общая информация'
 
     def __str__(self):
         return f"{self.id}"
+
 
 class BedTypesModel(models.Model):
     """
@@ -232,6 +249,8 @@ class BedTypesModel(models.Model):
 
     class Meta:
         db_table = '"api_bedtypes"'
+        verbose_name_plural = 'Типы спальных мест'
+        verbose_name = 'Тип спального места'
 
     def __str__(self):
         return self.bed_type
@@ -266,6 +285,8 @@ class BathroomAmenitiesModel(models.Model):
 
     class Meta:
         db_table = '"api_bathroomamenities"'
+        verbose_name_plural = 'Типы ванной комнаты'
+        verbose_name = 'Тип ванной комнаты'
 
     def __str__(self):
         return self.bathroom_amenities_name
@@ -297,6 +318,8 @@ class CategoriesAmenitiesModel(models.Model):
 
     class Meta:
         db_table = '"api_categoriesamenities"'
+        verbose_name_plural = 'Категории удобств'
+        verbose_name = 'Категория удобства'
 
     def __str__(self):
         return self.categories_amenities_title
@@ -317,6 +340,8 @@ class AmenitiesModel(models.Model):  # Amenities - удобства
 
     class Meta:
         db_table = '"api_amenities"'
+        verbose_name_plural = 'Удобство'
+        verbose_name = 'Удобство'
 
     def __str__(self):
         return self.amenities_name
@@ -325,11 +350,13 @@ class AmenitiesModel(models.Model):  # Amenities - удобства
 class ImageUrlsModel(models.Model):
     # image_path_url = models.ImageField(upload_to='images/')
     image_path_url = models.CharField(max_length=100, unique=True)
+
     # object_room = models.ForeignKey('ObjectRoomModel', on_delete=models.DO_NOTHING)
 
     class Meta:
         db_table = '"api_imageurls"'
-
+        verbose_name_plural = 'Изображения'
+        verbose_name = 'Изображение'
 
     def __str__(self):
         return self.image_path_url
@@ -348,13 +375,16 @@ class ImageConnectorModel(models.Model):
 class PlacingRulesModel(models.Model):
     # TODO всем полям ниже нужны значения по умолчанию в select
     with_children = models.BooleanField(default=False)
-    age = models.PositiveIntegerField(default=0)
+    # age = models.PositiveIntegerField(default=0)  #TODO если указывать возраст, то нужно добавлять возможность указывать возраст  для нескольких детей
     with_animals = models.BooleanField(default=False)
     smoking_is_allowed = models.BooleanField(default=False)
     parties_are_allowed = models.BooleanField(default=False)
 
     class Meta:
         db_table = '"api_placingrules"'
+        verbose_name_plural = 'Правила размещения'
+        verbose_name = 'Правило размещения'
+
 
 #
 # class ArrivalsDepartueModel(models.Model):
@@ -377,7 +407,6 @@ class PlacingRulesModel(models.Model):
 #
 
 class ObjectRoomModel(models.Model):
-
     CREDIT_CARD = 'Картой'
     CASH = 'Наличными'
     WIRE_TRANSFER = 'Перевод'
@@ -387,7 +416,6 @@ class ObjectRoomModel(models.Model):
         (CASH, 'Наличными'),
         (WIRE_TRANSFER, 'Перевод'),
     ]
-
 
     title = models.CharField(max_length=100)
     # images_path = models.ForeignKey(ImageConnectorModel,
@@ -416,7 +444,9 @@ class ObjectRoomModel(models.Model):
 
     general_info = models.ForeignKey(GeneralInformationModel, on_delete=models.CASCADE, null=True, blank=True)
     # TODO в дальнейшем добавить возможность оценивать разные показатели и выводить среднее значение между всеми показателями
-    rating = models.DecimalField(default=0, decimal_places=4, max_digits=7, validators=(MinValueValidator(0.0), MaxValueValidator(10.0)))  # TODO рассмотреть в дальнешем вынести оценку в отдельную таблицу с большим количеством критериев
+    rating = models.DecimalField(default=0, decimal_places=4, max_digits=7, validators=(MinValueValidator(0.0),
+                                                                                        MaxValueValidator(
+                                                                                            10.0)))  # TODO рассмотреть в дальнешем вынести оценку в отдельную таблицу с большим количеством критериев
     votes = models.PositiveBigIntegerField(default=0)
     rating_sum = models.DecimalField(default=0, decimal_places=4, max_digits=7)
     building_info = models.ForeignKey(BuildingTypeModel, on_delete=models.DO_NOTHING)
@@ -428,9 +458,10 @@ class ObjectRoomModel(models.Model):
     update_datetime = models.DateTimeField(auto_now=True, null=True, blank=True)
     is_published = models.BooleanField(default=False, )
 
-
     class Meta:
         db_table = '"api_objectrooms"'
+        verbose_name_plural = 'Объекты ...?'
+        verbose_name = 'Объект  ...?'
 
     def __str__(self):
         return self.title
@@ -441,3 +472,9 @@ class ObjectRoomModel(models.Model):
 #     subject = models.ForeignKey("APIUserModel", on_delete=models.CASCADE, related_name='tokens')
 #     revoked = models.BooleanField(default=False)
 #
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
