@@ -3,15 +3,20 @@ import Briefly from "./Briefly";
 import DirectionRoute from "./DirectionRoute";
 import Carousel from "./Carousel";
 import Popular from "./Popular";
+import NavigateHeader from "../General page/NavigateHeader";
+import Footer from "../General page/Footer";
 
 
 const HomePage = (props) => {
     return (
         <div>
+            <NavigateHeader/>
+
             <Carousel/>
             <Briefly/>
             <DirectionRoute/><br/>
             <Popular/>
+            <Footer/>
         </div>
     )
 };

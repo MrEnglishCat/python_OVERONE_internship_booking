@@ -1,16 +1,17 @@
 import time
-from datetime import timezone, datetime, timedelta
-
+from datetime import datetime, timedelta
 from django.db import models
-from django.contrib.auth.models import User
-from . import users_models
+# from . import users_models
+# from . import api_auth
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-# для JWT-токена
-from django.conf import settings
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from rest_framework.authtoken.models import Token
+
+
+
+from rest_framework.views import APIView, status, Response
+from rest_framework import permissions
+from django.contrib.auth.models import User
+
 
 
 # Create your models here.
@@ -467,14 +468,3 @@ class ObjectRoomModel(models.Model):
         return self.title
 
 
-# class IssuedJWTTokenModel(models.Model):
-#     jti = models.CharField(max_length=36, unique=True, primary_key=True)
-#     subject = models.ForeignKey("APIUserModel", on_delete=models.CASCADE, related_name='tokens')
-#     revoked = models.BooleanField(default=False)
-#
-
-
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_auth_token(sender, instance=None, created=False, **kwargs):
-    if created:
-        Token.objects.create(user=instance)

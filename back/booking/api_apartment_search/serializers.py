@@ -5,7 +5,6 @@ from . import models
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CountryModel
-        # fields = '__all__'
         fields = ('name',)
 
 

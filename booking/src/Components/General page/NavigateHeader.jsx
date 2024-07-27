@@ -30,9 +30,10 @@ const NavigateHeader = () => {
                             </li>
 
                             <li className="nav-item">
-                                <a className="nav-link" href="#">Избранное</a>
+                                <a className="nav-link" href="#">Избранное(сделать как модальное окно)</a>
                             </li>
                             <li className="nav-item">
+
                                 <div id="myModal">
                                     <a className="nav-link" href="/login">Войти</a>
                                 </div>

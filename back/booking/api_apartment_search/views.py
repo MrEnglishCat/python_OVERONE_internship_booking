@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.shortcuts import render
 from django.db.models import Q, Count, ExpressionWrapper, F, FloatField
 from django.db.models.functions.comparison import NullIf
@@ -8,6 +10,18 @@ from rest_framework.views import APIView, exception_handler
 
 from . import models
 from . import serializers
+from .api_auth_views import RegistrationAPIView, LoginAPIView, LogoutAPIView, ResetTokenAPIView
+
+# для JWT-токена
+from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.tokens import RefreshToken
+from .serializers import CustomUserSerializer
+from rest_framework_simplejwt.authentication import authentication
+
+# ===============
 
 
 # Create your views here.
@@ -32,7 +46,7 @@ class RegionViewSet(viewsets.ModelViewSet):
 
 class UpdateRatingViewSet(APIView):  # TODO доделать
     serializer_class = serializers.UpdateRatingObjectSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = (permissions.IsAuthenticated,)
 
     def patch(self, request):
 
@@ -59,14 +73,24 @@ class UpdateRatingViewSet(APIView):  # TODO доделать
 class SearchMainPageViewSet(viewsets.ReadOnlyModelViewSet):
     # queryset = models.CityModel.objects.all()
     serializer_class = serializers.ObjectRoomSerializer
-    filter_backends = [filters.SearchFilter]
+    filter_backends = (filters.SearchFilter,)
+    permission_classes = (permissions.AllowAny,)
     # search_fields = ['country', 'region', 'city', 'name']
-    search_fields = ['title', 'city__name', 'city__country__name']
+    search_fields = ('title', 'city__name', 'city__country__name')
 
     def get_queryset(self):
 
-        pk = self.kwargs.get('pk', None)
 
+        # Проверка токена происходит под капотом. За счет permissions.IsAuthenticated
+        # request_token = self.request.META.get('HTTP_AUTHORIZATION', None)
+        # if request_token:
+        #     ...
+        #     authentication.authenticate(request_token=request_token)
+        # else:
+        #     return Response({'error': 'Не предоставлены данные для авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        # выполнение дойдет до этого места и далее, если токен будет валиден
+        pk = self.kwargs.get('pk', None)
         if pk and pk.isdigit():
 
             result = models.ObjectRoomModel.objects.filter(pk=int(pk))
@@ -92,5 +116,3 @@ class SearchMainPageViewSet(viewsets.ReadOnlyModelViewSet):
         else:
             # return Response({'error': f'pk is not valid value. Need integer, but your value is {pk}'}, status=status.HTTP_400_BAD_REQUEST)
             return models.ObjectRoomModel.objects.none()
-
-

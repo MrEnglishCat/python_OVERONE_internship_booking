@@ -23,4 +23,6 @@ urlpatterns = [
     path('auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('auth/token/register/', views.RegistrationAPIView.as_view(), name='register'),
     path('auth/token/login/', views.LoginAPIView.as_view(), name='login'),
+    path('auth/token/logout/', views.LogoutAPIView.as_view(), name='logout'),
+    path('auth/token/reset-all-token/', views.ResetTokenAPIView.as_view(), name='reset-all-token')
 ]

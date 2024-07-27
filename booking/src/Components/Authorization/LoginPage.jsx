@@ -1,71 +1,150 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
+import {Route, Link, Routes, useNavigate, Navigate, useLocation,} from "react-router-dom";
+import axios from "axios";
+import * as loginForm from "react-dom/test-utils";
 
-import {Route, Link, Routes} from "react-router-dom";
 
 function LoginPage() {
+    const LOGIN_API = "http://127.0.0.1:8000/api/v1/auth/token/login/"
+    const navigate = useNavigate();
+    const [validated, setValidated] = useState(false);
+    const [responseData, setResponseData] = useState({});
+    const [Username, setUsername] = useState("");
+    const [UserPassword, setUserPassword] = useState("");
+    const [token, setToken] = useState({});
+
+    async function auth({event, username, password}) {
+        const Username = await document.getElementById("login").value;
+        const UserPassword = await document.getElementById("password").value;
+        console.log('UserData: ', Username, UserPassword)
+
+        let response = await fetch(
+            LOGIN_API,
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    username: Username,
+                    password: UserPassword,
+                })
+                ,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "*/*",
+                    // 'Cache-Control': 'no-cache',
+                },
+            }
+        );
+
+        const token = await response.json();
+        sessionStorage.setItem("auth_token", token);
+        console.log('Token: ', token);
+
+        console.log('sessionToken: ', sessionStorage.getItem('auth_token').error);
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        setValidated(true);
+        auth(event);
+
+    };
+
+    function isValidate() {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+
+                    }
+                    form.classList.add('was-validated')
+
+                }, false)
+            })
+
+    };
+
 
     return (
-        <section class="h-100">
-            <div class="container h-100">
-                <div class="row justify-content-sm-center h-100">
-                    <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
-                        <div class="text-center my-5">
+        <section className="h-100">
+            <div className="container h-100">
+                <div className="row justify-content-sm-center h-100">
+                    <div className="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
+                        <div className="text-center my-5">
                             <img src="/image/logo/kvartirnik_logo.png" alt="logo" className="w-100"/>
                         </div>
-                        <div class="card shadow-lg">
-                            <div class="card-body p-5">
-                                <h1 class="fs-4 card-title fw-bold mb-4">Login</h1>
-                                <form method="POST" class="needs-validation" novalidate="" autocomplete="off">
-                                    <div class="mb-3">
+                        <div className="b--red h5 justify-content-center">
+                            {("error" in token) ? `${token.error}` : ""}
+                        </div>
+                        <div className="card shadow-lg">
+                            <div className="card-body p-5 ">
+                                <h1 className="fs-4 card-title fw-bold mb-4">Login</h1>
+                                <form method="POST" className="needs-validation" validate={validated} autoComplete="off"
+                                      onSubmit={(e) => handleSubmit(e)}>
+                                    <div className="mb-3">
 
-                                        <label class="mb-2 text-muted" for="email">E-Mail Address</label>
-                                        <input id="email" type="email" class="form-control" name="email"
+                                        {/*<label className="mb-2 text-muted" for="email">E-Mail Address</label>*/}
+                                        {/*<input id="email" type="email" className="form-control" name="email"*/}
+                                        {/*       required*/}
+                                        {/*       autofocus/>*/}
+
+                                        <label className="mb-2 text-muted" htmlFor="Login">Login</label>
+                                        <input id="login" type="text" className="form-control" name="login"
                                                required
-                                               autofocus/>
-                                        <div class="invalid-feedback">
-                                            Email is invalid
+                                               autoFocus="on"/>
+                                        <div className="invalid-feedback">
+                                            Login is invalid
                                         </div>
                                     </div>
 
-                                    <div class="mb-3">
-                                        <div class="mb-2 w-100">
-                                            <label class="text-muted" for="password">Password</label>
-                                            <Link to="/forgot" class="float-end">
+                                    <div className="mb-3">
+                                        <div className="mb-2 w-100">
+                                            <label className="text-muted" for="password">Password</label>
+                                            <Link to="/forgot" className="float-end">
                                                 Forgot Password?
                                             </Link>
                                         </div>
-                                        <input id="password" type="password" class="form-control" name="password"
+                                        <input id="password" type="password" className="form-control" name="password"
                                                required/>
-                                        <div class="invalid-feedback">
+                                        <div className="invalid-feedback">
                                             Password is required
                                         </div>
                                     </div>
 
-                                    <div class="d-flex align-items-center">
-                                        <div class="form-check">
+                                    <div className="d-flex align-items-center">
+                                        <div className="form-check">
                                             <input type="checkbox" name="remember" id="remember"
-                                                   class="form-check-input"/>
-                                            <label for="remember" class="form-check-label">Remember Me</label>
+                                                   className="form-check-input"/>
+                                            <label for="remember" className="form-check-label">Remember Me</label>
                                         </div>
-                                        <button type="submit" class="btn btn-primary ms-auto">
+                                        <button type="submit" name="submit" className="btn btn-primary ms-auto">
                                             Login
                                         </button>
+                                        {/*<input onSubmit={handleSubmit} type="submit" name="upload" value="Войти" className="btn btn-primary ms-auto"/>*/}
+
                                     </div>
                                 </form>
                             </div>
-                            <div class="card-footer py-3 border-0">
-                                <div class="text-center">
-                                    Don't have an account? <Link to="/register" class="text-dark">Create One</Link>
+                            <div className="card-footer py-3 border-0">
+                                <div className="text-center">
+                                    Don't have an account? <Link to="/register" className="text-dark">Create One</Link>
                                 </div>
                             </div>
                         </div>
-                        {/*<div class="text-center mt-5 text-muted">*/}
+                        {/*<div className="text-center mt-5 text-muted">*/}
                         {/*    Copyright &copy; 2017-2021 &mdash; Your Company*/}
                         {/*</div>*/}
                     </div>
                 </div>
             </div>
-            <script src="login.js"></script>
+            {/*<script src="login.js"></script>*/}
         </section>
     );
 

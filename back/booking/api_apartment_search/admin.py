@@ -3,7 +3,6 @@ from . import models
 from django.contrib.admin.views.main import ChangeList
 from django.core.paginator import EmptyPage, InvalidPage, Paginator
 
-
 # Register your models here.
 
 
@@ -135,3 +134,4 @@ class ObjectRoomModel(admin.ModelAdmin):
     autocomplete_fields = ('building_info',)
     raw_id_fields = ('city', 'building_info')
     # list_select_related = True
+

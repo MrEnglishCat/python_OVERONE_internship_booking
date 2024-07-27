@@ -3,6 +3,9 @@ import {Route, Link, Routes} from "react-router-dom";
 
 function RegisterPage() {
 
+
+
+
     return (
         <section class="h-100">
             <div class="container h-100">
@@ -16,16 +19,16 @@ function RegisterPage() {
                                 <h1 class="fs-4 card-title fw-bold mb-4">Register</h1>
                                 <form method="POST" class="needs-validation" novalidate="" autocomplete="off">
                                     <div class="mb-3">
-                                        <label class="mb-2 text-muted" for="name">Name</label>
-                                        <input id="name" type="text" class="form-control" name="name" value="" required autofocus/>
+                                        <label class="mb-2 text-muted" for="Login">Login</label>
+                                        <input id="name" type="text" class="form-control" name="Login"  required autofocus/>
                                         <div class="invalid-feedback">
-                                            Name is required
+                                            Login is required
                                         </div>
                                     </div>
 
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="email">E-Mail Address</label>
-                                        <input id="email" type="email" class="form-control" name="email" value="" required/>
+                                        <input id="email" type="email" class="form-control" name="email"  required/>
                                         <div class="invalid-feedback">
                                             Email is invalid
                                         </div>

@@ -19,7 +19,6 @@ function App() {
     return (
         <Router>
             <div className="wrapper">
-                <NavigateHeader/>
 
                 <Routes>
                     <Route path="/" element={<HomePage/>}/>
@@ -30,7 +29,7 @@ function App() {
                     <Route path="/forgot" element={<ForgotPage/>}/>
                     <Route path="*" element={<NotFound />} />
                 </Routes>
-                <Footer/>
+
             </div>
         </Router>
     );
