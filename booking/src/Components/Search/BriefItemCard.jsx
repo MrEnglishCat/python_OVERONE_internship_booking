@@ -69,12 +69,11 @@ const BriefItemCard = (props) => {
                     </div>
                 </div>
                 <div className="text-center">
-                    <Link to={`/searchresult/${props.item.id}`} state={props.item}>Подробнее...</Link>
+                    <Link to={`/search/${props.item.id}/`} state={props}>Подробнее...</Link>
                     <Routes>
                         <Route
-                            path="/searchresult/:id"
-                            // render=<DetailCard item={props.item}/>
-                            render={(props) => <DetailCard item={props.item}/> }
+                            path="/search/:id"
+                            render={(props) => <DetailCard props/>}
                         />
                     </Routes>
                 </div>

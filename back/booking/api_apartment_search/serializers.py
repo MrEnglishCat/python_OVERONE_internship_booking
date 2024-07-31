@@ -27,6 +27,18 @@ class CitySerializer(serializers.ModelSerializer):
         # exclude = ['region_id', 'country_id']
 
 
+class StreetTyoeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.StreetTypeModel
+        fields = "__all__"
+
+class AddressSerializer(serializers.ModelSerializer):
+    street_type = serializers.CharField(source='street_type.street_type')
+    class Meta:
+        model = models.AddressModel
+        fields = ('street_name', 'building_number', 'corps', 'location', 'street_type', 'has_elevator')
+
+
 class BuildingTypeSerializer(serializers.ModelSerializer):
     building_type_group = serializers.CharField(source='building_type_group.building_group_type')
 
@@ -70,7 +82,7 @@ class ObjectRoomSerializer(serializers.ModelSerializer):
     general_info = GeneralInformationSerializer(read_only=True)
     images_path = ImageSerializer(read_only=True, many=True)
     placing_rules = PlasingRulesSerializer(read_only=True)
-
+    address = AddressSerializer(read_only=True)
     class Meta:
         model = models.ObjectRoomModel
 

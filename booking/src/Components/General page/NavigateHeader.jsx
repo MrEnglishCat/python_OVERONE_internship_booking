@@ -4,7 +4,8 @@ import React, {Component} from "react";
 import Popular from "../Main page/Popular";
 
 
-const NavigateHeader = () => {
+const NavigateHeader = (token) => {
+    // console.log("TOKEN:", token)
     return (
         <div className="container justify-content-sm-center">
             <nav className="navbar navbar-expand-lg navbar-light ">
@@ -35,7 +36,7 @@ const NavigateHeader = () => {
                             <li className="nav-item">
 
                                 <div id="myModal">
-                                    <a className="nav-link" href="/login">Войти</a>
+                                    <a className="nav-link" href="/login">"Войти"</a>
                                 </div>
                                 <div className="modal-dialog modal-dialog-centered" id="myModal">
                                     {/*<ModalSignIn show={modalShow} onHide={() => setModalShow(false)}/>*/}

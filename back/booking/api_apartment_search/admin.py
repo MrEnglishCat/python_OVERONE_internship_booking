@@ -90,11 +90,27 @@ class RegionAdmin(admin.ModelAdmin):
     autocomplete_fields = ('country',)
 
 
+
+
+# @admin.register(models.AddressModel)
+# class AddressAdmin(admin.ModelAdmin):
+#     list_select_related = True
+
+
+
+class InlineAddressAdmin(admin.TabularInline):
+    model = models.AddressModel
+    list_display = ('id', 'street_type', 'street_name', 'building_number', 'corps', 'location', )
+    list_select_related = True
+    extra = 1
+
 @admin.register(models.StreetTypeModel)
 class StreetTypeAdmin(admin.ModelAdmin):
+    # model = models.StreetTypeModel
     # list_display = ('id', 'name')
     # search_fields = ('id', 'name')
     list_select_related = True
+    inlines = (InlineAddressAdmin,)
 
 
 @admin.register(models.BuildingGroupTypeModel)
@@ -126,10 +142,10 @@ class PlacingRulesAdmin(admin.ModelAdmin):
 
 @admin.register(models.ObjectRoomModel)
 class ObjectRoomModel(admin.ModelAdmin):
-    list_display = ('id', 'title', 'create_datetime', 'update_datetime', 'city')
+    list_display = ('id', 'title', 'create_datetime', 'update_datetime', 'city',)
 
     list_display_links = ('title',)
-    search_fields = ('id', 'title')
+    search_fields = ('id', 'title',)
     # autocomplete_fields = ('city', 'building_info',)  # изначальная строка
     autocomplete_fields = ('building_info',)
     raw_id_fields = ('city', 'building_info')

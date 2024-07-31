@@ -10,35 +10,35 @@ const Search = () => {
     const [isStartSearch, setStartSearch] = useState(false)
     const [searchData, setSearchData] = useState([]);
     const [inputData, setInputData] = useState("");
+    const [token, setToken] = useState();
+
+
 
     // за счет params.id можно по get запросу получить данные.
     async function RunSearch() {
         // GET request using axios with set headers
-
+        let tk = sessionStorage.auth_token;
+        console.log("SEARCH tk: ", tk);
+        setToken(token)
+        console.log('SEARCH Token: ', token);
         var data_input_location = document.getElementById("input_search_location");
         var data_input_datetime_check_in = document.getElementById("input_search_datetime_check-in");
         var data_input_datetime_departure = document.getElementById("input_search_datetime_departure");
 
         setInputData(data_input_location.value);
-        // console.log(inputData)
         const headers = {
             'Accept': '*/*',
         };
         responseData = await axios.get(API_URL_SEARCH + data_input_location.value, {headers});
         // ниже В responseData появился атрибут results т к в DRF добавил пагинацию
-        setSearchData(responseData.data.results);
-
-        // console.log(data_input_datetime_check_in.value);
-        // console.log(data_input_datetime_departure.value);
-        // console.log(data_input_datetime_departure.value > data_input_datetime_check_in.value);
+        setSearchData(await responseData.data.results);
         setStartSearch(true)
 
     }
 
-
     return (
         <div>
-            <NavigateHeader/>
+            <NavigateHeader token={token}/>
 
             <div id="Search_bar"><br/>
                 <h1 className="display-1 text-center"><b>Найдём, где остановиться!</b></h1>

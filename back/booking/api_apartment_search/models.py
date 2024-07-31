@@ -94,17 +94,28 @@ class StreetTypeModel(models.Model):
         return self.street_type
 
 
-#
-#
-# class AddressModel(models.Model):
-#     street_name = models.CharField(max_length=100)
-#     building = models.IntegerField()
-#     corps = models.IntegerField()
-#     location = models.CharField(
-#         max_length=100)  # TODO почитать про задание координат в джанго, что бы можно было использовать с картами
-#     street_type = models.ForeignKey(StreetTypeModel, on_delete=models.DO_NOTHING)
-#
-#
+
+
+class AddressModel(models.Model):
+    street_name = models.CharField(max_length=100)
+    building_number = models.IntegerField(blank=True, null=True)
+    corps = models.IntegerField(blank=True, null=True)
+    location = models.CharField(
+        max_length=100, blank=True, null=True)  # TODO почитать про задание координат в джанго, что бы можно было использовать с картами
+    street_type = models.ForeignKey(StreetTypeModel, on_delete=models.DO_NOTHING)
+    has_elevator = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = '"api_addresses"'
+        verbose_name_plural = "Адреса зданий"
+        verbose_name = "Адрес здания"
+
+
+    def __str__(self):
+
+        corps = f"к. {self.corps}" if self.corps else ''
+        return f"{self.street_type} {self.street_name} {self.building_number} {corps}"
+
 class BuildingGroupTypeModel(models.Model):
     """
     Номера, спальные места - в отеле, гостевом доме или хостеле - desc Гостям будет предоставлен номер в отеле, гостевом доме или спальное место в хостеле
@@ -210,10 +221,14 @@ class GeneralInformationModel(models.Model):
     #     default=CASH
     # )
 
-    room_square = models.FloatField()
-    floor = models.PositiveIntegerField()
-    floor_in_the_house = models.PositiveIntegerField()
-    count_rooms = models.PositiveIntegerField()
+    room_square = models.FloatField(null=True, blank=True)
+    floor = models.PositiveIntegerField(null=True, blank=True)
+    floor_in_the_house = models.PositiveIntegerField(null=True, blank=True)
+    rooms_count = models.PositiveIntegerField(null=True, blank=True)
+    guests_count = models.PositiveIntegerField(null=True, blank=True)
+    count_sleeping_places = models.PositiveIntegerField(null=True, blank=True)
+
+
     kitchen = models.CharField(
         'kitchen',
         choices=KITCHEN_CHOICES,
@@ -231,7 +246,7 @@ class GeneralInformationModel(models.Model):
         verbose_name = 'Общая информация'
 
     def __str__(self):
-        return f"{self.id}"
+        return f"{self.room_square}м2 | {self.floor}/{self.floor_in_the_house} | ком {self.rooms_count} | {self.room_repair}"
 
 
 class BedTypesModel(models.Model):
@@ -255,6 +270,7 @@ class BedTypesModel(models.Model):
 
     def __str__(self):
         return self.bed_type
+
 
 
 # TODO возможно нужна промежуточная модель многие ко многим между BedTypesModel и SleepingPlacesModel
@@ -375,7 +391,7 @@ class ImageConnectorModel(models.Model):
 #
 class PlacingRulesModel(models.Model):
     # TODO всем полям ниже нужны значения по умолчанию в select
-    with_children = models.BooleanField(default=False)
+    with_children = models.BooleanField(default=False, verbose_name="С детьми любого возраста")
     # age = models.PositiveIntegerField(default=0)  #TODO если указывать возраст, то нужно добавлять возможность указывать возраст  для нескольких детей
     with_animals = models.BooleanField(default=False)
     smoking_is_allowed = models.BooleanField(default=False)
@@ -434,6 +450,7 @@ class ObjectRoomModel(models.Model):
         choices=PAYMENT_METHOD_CHOICES,
         default=CASH
     )
+    address = models.ForeignKey(AddressModel, on_delete=models.DO_NOTHING, null=True, blank=True)
     arrival_time = models.TimeField(default=datetime.now().strftime('%H:%M'))
     departure_time = models.TimeField(default=(datetime.now() + timedelta(hours=1)).strftime('%H:%M'))
     minimum_length_of_stay = models.PositiveIntegerField(default=1)  # минимальный срок проживания

@@ -36,10 +36,10 @@ function LoginPage() {
         );
 
         const token = await response.json();
-        sessionStorage.setItem("auth_token", token);
+        sessionStorage.setItem("auth_token", JSON.stringify(token));
         console.log('Token: ', token);
 
-        console.log('sessionToken: ', sessionStorage.getItem('auth_token').error);
+        console.log('sessionToken: ', sessionStorage.auth_token);
     };
 
     const handleSubmit = async (event) => {
