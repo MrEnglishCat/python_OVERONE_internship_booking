@@ -68,7 +68,8 @@ const Booking = (props) => {
                 <div class="container">
                     <div className="row">
                         <div className="col">
-                            <a href="#" className="btn btn-outline-success">
+
+                            <a href="#" className="btn btn-outline-success ">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                      className="bi bi-suit-heart" viewBox="0 0 16 16">
                                     <path

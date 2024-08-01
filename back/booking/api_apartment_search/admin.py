@@ -141,7 +141,7 @@ class PlacingRulesAdmin(admin.ModelAdmin):
 
 class InlineReserve(admin.TabularInline):
     list_select_related = True
-    model = models.Reserve
+    model = models.ReservationModel
     extra = 1
 
 

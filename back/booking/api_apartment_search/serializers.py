@@ -83,6 +83,7 @@ class ObjectRoomSerializer(serializers.ModelSerializer):
     images_path = ImageSerializer(read_only=True, many=True)
     placing_rules = PlasingRulesSerializer(read_only=True)
     address = AddressSerializer(read_only=True)
+
     class Meta:
         model = models.ObjectRoomModel
 
@@ -91,6 +92,16 @@ class ObjectRoomSerializer(serializers.ModelSerializer):
             "rating_sum",
             "create_datetime",
         )
+
+
+class ReservationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ReservationModel
+        fields = '__all__'
+        read_only_fields = ('create_datetime',)
+
+
+
 
 
 class CustomUserSerializer(serializers.ModelSerializer):

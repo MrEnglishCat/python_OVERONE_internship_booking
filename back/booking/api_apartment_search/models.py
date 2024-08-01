@@ -489,7 +489,7 @@ class ObjectRoomModel(models.Model):
         return self.title
 
 
-class Reserve(models.Model):
+class ReservationModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='reserved_user')
     room = models.ForeignKey(ObjectRoomModel, on_delete=models.DO_NOTHING, related_name='room', verbose_name='комната')
     start_date = models.DateField('Дата, ОТ',)

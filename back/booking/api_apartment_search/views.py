@@ -116,3 +116,5 @@ class SearchMainPageViewSet(viewsets.ReadOnlyModelViewSet):
         else:
             # return Response({'error': f'pk is not valid value. Need integer, but your value is {pk}'}, status=status.HTTP_400_BAD_REQUEST)
             return models.ObjectRoomModel.objects.none()
+
+

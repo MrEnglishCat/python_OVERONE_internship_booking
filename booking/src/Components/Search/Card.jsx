@@ -33,7 +33,7 @@ const Card = (props) => {
                                 height="20"/><span className="fw-bold">{Number(props.item.rating).toFixed(1)}</span>
                             &nbsp;( 88
                             отзывов_HC
-                            ) {props.item.address ? `${props.item.city.name}, ${props.item.address.street_type} ${props.item.address.street_name} ${props.item.address.building_number} ${props.item.address.corps}` : ""}
+                            ) {props.item.address ? `${props.item.city.name}, ${props.item.address.street_type} ${props.item.address.street_name} ${props.item.address.building_number} ${props.item.address.corps ? props.item.address.corps : ""}` : ""}
                         </p>
 
                         <div className="item-details-image shadow-lg">
@@ -43,13 +43,36 @@ const Card = (props) => {
                         <br/>
                         <div className="item-details shadow-lg">
                             <div className="item-details-info">
+
+
                                 {props.item.building_info && props.item.general_info ?
                                     <h4>{props.item.building_info.building_type_name} {props.item.general_info.room_square}м<sup>2</sup>
                                     </h4> : ""}
-                                <div className="justify-center">{props.item.general_info ?
-                                    <h6>Гостей: {props.item.general_info.guests_count} Комнат: {props.item.general_info.rooms_count} {props.item.general_info.kitchen} этаж {props.item.general_info.floor} из {props.item.general_info.floor_in_the_house}{props.item.address ? `${props.item.address.has_elevator ? ", есть лифт" : "."}` : "."}
-                                    </h6> : ""}</div>
-                                {/**/}
+
+                                <div className="container">
+                                    {props.item.general_info ?
+                                        (<div className="row">
+                                            <div className="col">
+                                                <h6>Гостей: {props.item.general_info.guests_count}</h6>
+                                            </div>
+                                            <div className="col">
+                                                <h6>Комнат: {props.item.general_info.rooms_count} </h6>
+                                            </div>
+                                            <div className="col">
+                                                <h6>{props.item.general_info.kitchen} </h6>
+                                            </div>
+                                            <div className="col">
+                                                <h6>{props.item.general_info.room_repair} </h6>
+                                            </div>
+                                            <div className="col">
+                                                <h6>этаж {props.item.general_info.floor} из {props.item.general_info.floor_in_the_house}{props.item.address ? `${props.item.address.has_elevator ? ", есть лифт" : "."}` : "."} </h6>
+
+                                            </div>
+                                        </div>) : ""}
+                                </div>
+                                <div className="justify-center">
+                                </div>
+
 
                                 <p>{props.item.building_description}</p>
                                 <h6>Спальные
