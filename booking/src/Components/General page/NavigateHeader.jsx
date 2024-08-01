@@ -36,7 +36,7 @@ const NavigateHeader = (token) => {
                             <li className="nav-item">
 
                                 <div id="myModal">
-                                    <a className="nav-link" href="/login">"Войти"</a>
+                                    <a className="nav-link" href="/login">Войти</a>
                                 </div>
                                 <div className="modal-dialog modal-dialog-centered" id="myModal">
                                     {/*<ModalSignIn show={modalShow} onHide={() => setModalShow(false)}/>*/}

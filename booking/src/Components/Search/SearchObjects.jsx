@@ -40,7 +40,7 @@ const Search = () => {
         <div>
             <NavigateHeader token={token}/>
 
-            <div id="Search_bar"><br/>
+            <div id="Search_bar" ><br/>
                 <h1 className="display-1 text-center"><b>Найдём, где остановиться!</b></h1>
                 <p className="lead text-center">Квартиры, отели, гостевые дома — 280 тысяч вариантов для поездок по
                     России и
@@ -71,6 +71,9 @@ const Search = () => {
                 </span>
                 </div>
             </div>
+            <br/>
+            <br/>
+
             <Footer/>
         </div>
         )

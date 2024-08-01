@@ -1,6 +1,7 @@
 import time
 from datetime import datetime, timedelta
 from django.db import models
+from django.contrib.auth.models import User
 # from . import users_models
 # from . import api_auth
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -396,6 +397,7 @@ class PlacingRulesModel(models.Model):
     with_animals = models.BooleanField(default=False)
     smoking_is_allowed = models.BooleanField(default=False)
     parties_are_allowed = models.BooleanField(default=False)
+    accounting_documents = models.BooleanField(default=False)
 
     class Meta:
         db_table = '"api_placingrules"'
@@ -445,6 +447,7 @@ class ObjectRoomModel(models.Model):
     #     placing_rules = models.ForeignKey(PlacingRulesModel, on_delete=models.DO_NOTHING)
     #     arrival_departure = models.ForeignKey(ArrivalsDepartueModel, on_delete=models.DO_NOTHING)
     prepayment = models.FloatField(default=0.0)  # persent default 20%   default_currency = BYN
+    payment_day = models.FloatField(default=0.0)
     payment_method = models.CharField(
         'payment method',
         choices=PAYMENT_METHOD_CHOICES,
@@ -471,10 +474,11 @@ class ObjectRoomModel(models.Model):
 
     city = models.ForeignKey(CityModel, on_delete=models.DO_NOTHING)
 
-    # user = models.ForeignKey(users_models.UserModel, on_delete=models.DO_NOTHING)
     create_datetime = models.DateTimeField(auto_now_add=True)
     update_datetime = models.DateTimeField(auto_now=True, null=True, blank=True)
     is_published = models.BooleanField(default=False, )
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True)
+
 
     class Meta:
         db_table = '"api_objectrooms"'
@@ -485,3 +489,12 @@ class ObjectRoomModel(models.Model):
         return self.title
 
 
+class Reserve(models.Model):
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='reserved_user')
+    room = models.ForeignKey(ObjectRoomModel, on_delete=models.DO_NOTHING, related_name='room', verbose_name='комната')
+    start_date = models.DateField('Дата, ОТ',)
+    end_date = models.DateField('Дата, ДО')
+
+    class Meta:
+        verbose_name = 'бронь'
+        verbose_name_plural = 'брони'

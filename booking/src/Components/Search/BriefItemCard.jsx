@@ -15,7 +15,7 @@ const BriefItemCard = (props) => {
 
     return (
         <div key={props.item.id}>
-            <div className="card mb-3 shadow" style={{width: 540, margin: 'auto'}}>
+            <div className="card mb-3 shadow-lg" style={{width: 540, margin: 'auto'}}>
                 <div className="row g-0">
                     <div className="col-md-4">
                         <img src="image/user_objects/1/1.webp" className="img-fluid rounded-start" alt="..." width={"100%"} height={"100%"} />
