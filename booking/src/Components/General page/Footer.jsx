@@ -3,10 +3,10 @@ import React, { Component } from "react";
 
 const Footer = () => {
     return (
-        <div className="navbar-fixed-bottom row-fluid wrapper">
-            <div className="navbar-inner">
-                <div className="blockcode">
-                    <footer className="shadow mt-auto">
+        <div className="navbar-fixed-bottom row-fluid wrapper ">
+            <div className="navbar-inner ">
+                <div className="blockcode ">
+                    <footer className="shadow mt-auto   rounded-5">
                         <div
                             className="d-flex justify-content-between align-items-center mx-auto py-4 flex-wrap"
                             style={{width: "80%"}}

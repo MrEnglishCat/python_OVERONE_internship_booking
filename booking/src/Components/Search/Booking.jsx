@@ -63,9 +63,9 @@ const Booking = (props) => {
 
 
     return (
-        <div className="position-fixed">
-            <div className="container-fluid">
-                <div class="container">
+        <div className="position-fixed ">
+            <div className="container-fluid ">
+                <div class="container ">
                     <div className="row">
                         <div className="col">
 
@@ -78,7 +78,7 @@ const Booking = (props) => {
                                 &nbsp;В избранное
                             </a>
                         </div>
-                        <div className="col">
+                        <div className="col ">
                             <a href="#" className="btn btn-outline-success">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                      className="bi bi-share" viewBox="0 0 16 16">
@@ -92,7 +92,7 @@ const Booking = (props) => {
                 </div>
                 <br/>
                 <form>
-                    <div className="container shadow-lg">
+                    <div className="container shadow-lg  rounded-5">
                         <br/>
                         {/*<DatePicker/>*/}
 

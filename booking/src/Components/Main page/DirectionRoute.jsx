@@ -3,7 +3,7 @@ import DirectionRouteCard from "./DirectionRouteCard";
 
 const DirectionRoute = () => {
     return (
-        <div className="container routeDirection shadow">
+        <div className="container routeDirection shadow  rounded-5">
             <p class="h1 text-center">Идеи для отпуска</p>
 
             <div class="justify-content-center">

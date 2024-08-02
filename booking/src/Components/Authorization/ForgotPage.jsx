@@ -12,7 +12,7 @@ function ForgotPage(props) {
 						<div class="text-center my-5">
 							<img src="/image/logo/kvartirnik_logo.png" alt="logo" className="w-100"/>
 						</div>
-						<div class="card shadow-lg">
+						<div class="card shadow-lg   rounded-5">
 							<div class="card-body p-5">
 								<h1 class="fs-4 card-title fw-bold mb-4">Forgot Password</h1>
 								<form method="POST" class="needs-validation" novalidate="" autocomplete="off">

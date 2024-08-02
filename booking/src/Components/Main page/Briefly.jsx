@@ -2,7 +2,7 @@ import React, {useState} from "react"
 
 const Briefly = () => {
     return (
-        <div className="briefly shadow-lg p-3 mb-5 bg-body-tertiary rounded">
+        <div className="briefly shadow-lg p-3 mb-5 bg-body-tertiary  rounded-5">
             <div className="container">
                 <div className="row">
                     <div className="col" data-width="100">

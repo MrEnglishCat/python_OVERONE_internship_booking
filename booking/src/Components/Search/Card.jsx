@@ -10,7 +10,6 @@ const Card = (props) => {
     // получаем параметры
     console.log('PROPS', props.item);
 
-
     const ConvertDatetime = (datetime) => {
         let objectDT = new Date(datetime);
         let day = objectDT.getDate();
@@ -22,12 +21,11 @@ const Card = (props) => {
 
 
     return (
-        <div className="container">
+        <div className="container  ">
             <div className="row">
-                <div className="col-8 flex-container-scroll">
+                <div className="col-lg-8">
                     <div className="item-details-container row-fluid">
                         <h2 className="item-details-heading">{props.item.title}</h2>
-
                         <p><img src="/image/otherIcons/red_star_rating.png"
                                 width="30"
                                 height="20"/><span className="fw-bold">{Number(props.item.rating).toFixed(1)}</span>
@@ -36,12 +34,41 @@ const Card = (props) => {
                             ) {props.item.address ? `${props.item.city.name}, ${props.item.address.street_type} ${props.item.address.street_name} ${props.item.address.building_number} ${props.item.address.corps ? props.item.address.corps : ""}` : ""}
                         </p>
 
-                        <div className="item-details-image shadow-lg">
-                            <img src="/image/user_objects/2/1.webp" alt="" width="400" height="300"/>
-
+                        <div className="container ">
+                            <div id="carouselExampleFade" className="carousel slide carousel-fade"
+                                 data-bs-ride="carousel ">
+                                <div className="carousel-inner ">  {/*, objectFit: "cover"*/}
+                                    <div className="carousel-item active">
+                                        <img src="/image/user_objects/2/1.webp"
+                                             className="d-grid img-fluid rounded-5"
+                                             alt="..." style={{display: "flex", objectFit: "cover",}}/>
+                                    </div>
+                                    <div className="carousel-item">
+                                        <img src="/image/user_objects/2/2.webp"
+                                             className="d-grid img-fluid rounded-5"
+                                             alt="..." style={{display: "flex", objectFit: "cover",}}/>
+                                    </div>
+                                    <div className="carousel-item">
+                                        <img src="/image/user_objects/2/3.webp"
+                                             className="d-grid img-fluid rounded-5"
+                                             alt="..." style={{display: "flex", objectFit: "cover",}}/>
+                                    </div>
+                                </div>
+                                <button className="carousel-control-prev" type="button"
+                                        data-bs-target="#carouselExampleFade" data-bs-slide="prev">
+                                    <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span className="visually-hidden">Previous</span>
+                                </button>
+                                <button className="carousel-control-next" type="button"
+                                        data-bs-target="#carouselExampleFade" data-bs-slide="next">
+                                    <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span className="visually-hidden">Next</span>
+                                </button>
+                            </div>
                         </div>
+
                         <br/>
-                        <div className="item-details shadow-lg">
+                        <div className="item-details shadow-lg p-3  rounded-5">
                             <div className="item-details-info">
 
 
@@ -70,9 +97,6 @@ const Card = (props) => {
                                             </div>
                                         </div>) : ""}
                                 </div>
-                                <div className="justify-center">
-                                </div>
-
 
                                 <p>{props.item.building_description}</p>
                                 <h6>Спальные
@@ -82,7 +106,7 @@ const Card = (props) => {
 
                         </div>
                         <br/>
-                        <div className="item-details shadow-lg">
+                        <div className="item-details shadow-lg p-3 rounded-5">
                             <h4>Правила размещения</h4>
                             <div className="container">
                                 <div className="row row-cols-3">
@@ -95,7 +119,7 @@ const Card = (props) => {
                                 </div>
 
                             </div>
-                            <ul className="list-group list-group-flush">
+                            <ul className="list-group list-group-flush ">
                                 {props.item.placing_rules ? props.item.placing_rules.with_children ?
                                     <li className="list-group-item">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
@@ -136,13 +160,13 @@ const Card = (props) => {
                         {/*<Link to="/" className="go-back-button">Go Back</Link>*/}
                     </div>
                 </div>
-                <div className="col-4">
+                <div className="col-lg-4">
                     <Booking prepayment={props.item.prepayment} payment_day={props.item.payment_day}/>
                 </div>
             </div>
         </div>
 
-    )
+    );
 };
 
 export default Card;

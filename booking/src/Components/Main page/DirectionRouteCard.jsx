@@ -5,9 +5,9 @@ const DirectionRouteCard = ({image_path, alt_name, title, footer}) => {
     return (
         <div className="col">
 
-            <div className="routeDirectionCard">
-                <div className="card bg-dark text-white">
-                    <img src={image_path} className="card-img " alt={alt_name} width="100" height="300"/>
+            <div className="routeDirectionCard  rounded-5">
+                <div className="card bg-dark text-white  rounded-5">
+                    <img src={image_path} className="card-img  rounded-5" alt={alt_name} width="100" height="300"/>
 
                     <div className="card-img-overlay">
                         <h4 className="card-title">{title}</h4>

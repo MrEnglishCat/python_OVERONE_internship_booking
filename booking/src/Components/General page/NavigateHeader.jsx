@@ -52,7 +52,6 @@ const NavigateHeader = (token) => {
                         </ul>
                     </div>
                 </div>
-
             </nav>
         </div>
 

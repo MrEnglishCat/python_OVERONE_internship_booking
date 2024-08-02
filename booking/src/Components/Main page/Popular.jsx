@@ -2,10 +2,11 @@ import React from "react";
 
 function Popular(props) {
     return (
-        <div className="container-xl shadow ">
+        <div className="container-xl shadow   rounded-5">
             <h1 className="text-center">Популярно за рубежом</h1><br/>
             <div className="row row-cols-xl-4">
                 {/*Сделать так что бы ссылки были похожи на обычный текст!!!!*/}
+
                 <div className="col col-md-4 col ">
 
                     <div className="row">
