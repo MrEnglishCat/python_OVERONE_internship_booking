@@ -3,6 +3,7 @@ import DatePicker from "react-datepicker";
 import CustomDatepicker from "./CustomDatepicker";
 import axios from "axios";
 
+
 const Booking = (props) => {
 
     const [startD, setStartD] = useState();
@@ -57,7 +58,8 @@ const Booking = (props) => {
         let month = objectDT.getMonth() + 1;
         let year = objectDT.getFullYear();
         // return`${month}/${day}/${year}`;
-        return `${year}-${month}-${day}`;
+        // return `${year}-${month}-${day}`;
+        return `${day}-${month}-${year}`;
 
     };
 
@@ -107,10 +109,10 @@ const Booking = (props) => {
                                 <input id="endDate" className="form-control" type="date" placeholder="Отъезд"/>
                             </div>
                         </div>
-                        <p>Предоплата: {props.prepayment} BYN</p>
-                        <p><span>Оплата за сутки:</span> {props.payment_day} BYN</p>
+                        <p>Предоплата: {props.prepayment} BYN (~{(props.prepayment/exchangeUSD).toFixed(2)} USD)</p>
+                        <p><span>Оплата за сутки:</span> {props.payment_day} BYN (~{(props.payment_day/exchangeUSD).toFixed(2)} USD)</p>
 
-                        <p>Оплата при заселении: {props.payment_day - props.prepayment} BYN</p>
+                        <p>Оплата при заселении: {props.payment_day - props.prepayment} BYN (~{((props.payment_day - props.prepayment)/exchangeUSD).toFixed(2)} USD)</p>
                         <p>Курс НБ РБ на {getDate()}: 1 USD - {exchangeUSD} BYN</p>
                         <br/>
                         {/*<div className="position-fixed">...</div>*/}

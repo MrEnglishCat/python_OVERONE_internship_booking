@@ -75,6 +75,14 @@ class PlasingRulesSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ReviewsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ReviewsModel
+        fields = '__all__'
+
+
+
+
 class ObjectRoomSerializer(serializers.ModelSerializer):
     city = CitySerializer(read_only=True)
     building_info = BuildingTypeSerializer(read_only=True)
@@ -83,7 +91,6 @@ class ObjectRoomSerializer(serializers.ModelSerializer):
     images_path = ImageSerializer(read_only=True, many=True)
     placing_rules = PlasingRulesSerializer(read_only=True)
     address = AddressSerializer(read_only=True)
-
     class Meta:
         model = models.ObjectRoomModel
 
@@ -99,9 +106,6 @@ class ReservationSerializer(serializers.ModelSerializer):
         model = models.ReservationModel
         fields = '__all__'
         read_only_fields = ('create_datetime',)
-
-
-
 
 
 class CustomUserSerializer(serializers.ModelSerializer):

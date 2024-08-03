@@ -5,21 +5,27 @@ import * as loginForm from "react-dom/test-utils";
 
 
 function LoginPage() {
-    const LOGIN_API = "http://127.0.0.1:8000/api/v1/auth/token/login/"
+    const API_LOGOUT = "http://127.0.0.1:8000/api/v1/auth/token/login/"
     const navigate = useNavigate();
     const [validated, setValidated] = useState(false);
-    const [responseData, setResponseData] = useState({});
-    const [Username, setUsername] = useState("");
-    const [UserPassword, setUserPassword] = useState("");
     const [token, setToken] = useState({});
+    const [error, setError] = useState();
+
+
+    useEffect(()=>{
+        if (sessionStorage.getItem("auth_token")) {
+            navigate(-1)
+        }
+    }, [])
 
     async function auth({event, username, password}) {
         const Username = await document.getElementById("login").value;
         const UserPassword = await document.getElementById("password").value;
-        console.log('UserData: ', Username, UserPassword)
+
+
 
         let response = await fetch(
-            LOGIN_API,
+            API_LOGOUT,
             {
                 method: "POST",
                 body: JSON.stringify({
@@ -34,12 +40,19 @@ function LoginPage() {
                 },
             }
         );
+        if (response.ok) {
+            const token = await response.json();
+            sessionStorage.setItem("auth_token", JSON.stringify(token));
+            navigate("/")
 
-        const token = await response.json();
-        sessionStorage.setItem("auth_token", JSON.stringify(token));
-        console.log('Token: ', token);
+        } else {
+            let error = await response.json();
+            console.log("LOGIN", error.error);
+            setError(error.error)
+            // navigate(0)
+        }
 
-        console.log('sessionToken: ', sessionStorage.auth_token);
+
     };
 
     const handleSubmit = async (event) => {
@@ -80,9 +93,7 @@ function LoginPage() {
                         <div className="text-center my-5">
                             <img src="/image/logo/kvartirnik_logo.png" alt="logo" className="w-100 "/>
                         </div>
-                        <div className="b--red h5 justify-content-center">
-                            {("error" in token) ? `${token.error}` : ""}
-                        </div>
+                        {error ? <div className="alert alert-danger">{error}</div>: ""}
                         <div className="card shadow-lg   rounded-5">
                             <div className="card-body p-5 ">
                                 <h1 className="fs-4 card-title fw-bold mb-4">Login</h1>

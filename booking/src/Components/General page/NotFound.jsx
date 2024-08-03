@@ -1,8 +1,9 @@
 import React from "react";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 
 function NotFound() {
+    const navigate = useNavigate();
     return (
         <div class="d-flex align-items-center justify-content-center vh-100">
             <div class="text-center row">
@@ -17,7 +18,7 @@ function NotFound() {
                     <p class="lead">
                         Страница которую вы искали не существует!
                     </p>
-                    <Link to="/" class="btn btn-primary">На главную</Link>
+                    <Link to={navigate(-1)} class="btn btn-primary">На предыдущую страницу..</Link>
                 </div>
             </div>
         </div>

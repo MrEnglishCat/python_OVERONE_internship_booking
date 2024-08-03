@@ -496,5 +496,41 @@ class ReservationModel(models.Model):
     end_date = models.DateField('Дата, ДО')
 
     class Meta:
+        db_table = '"api_reservation"'
         verbose_name = 'бронь'
         verbose_name_plural = 'брони'
+
+
+
+class RatingModel(models.Model):
+    cleanliness = models.PositiveSmallIntegerField(default=0, verbose_name="Чистота")
+    conformity_to_photos = models.PositiveSmallIntegerField(default=0, verbose_name="Соответствие фото")
+    timeliness_of_check_in = models.PositiveSmallIntegerField(default=0, verbose_name="Своевременность заселения")
+    price_quality = models.PositiveSmallIntegerField(default=0, verbose_name="Цена-качество")
+    location = models.PositiveSmallIntegerField(default=0, verbose_name="Расположение")
+    qualiti_of_service = models.PositiveSmallIntegerField(default=0, verbose_name="Качество обслуживания")
+
+    class Meta:
+        db_table = '"api_ratings"'
+        verbose_name = "Оценка"
+        verbose_name_plural = "Оценки"
+
+    def __str__(self):
+        return f"{(self.cleanliness + self.conformity_to_photos + self.timeliness_of_check_in + self.price_quality + self.location + self.qualiti_of_service)/6}"
+
+class ReviewsModel(models.Model):
+    review_text = models.TextField(null=True, blank=True, verbose_name="Отзыв")
+    review_created = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    review_updated = models.DateTimeField(auto_now_add=True, verbose_name="Дата редактирования")
+    likes = models.PositiveIntegerField(default=0, verbose_name="Нравится")
+    dislikes = models.PositiveIntegerField(default=0, verbose_name="Не нравится")
+    room_object = models.ForeignKey(ObjectRoomModel, on_delete=models.DO_NOTHING, verbose_name="Объект")
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="Пользователь")
+    ratings = models.ForeignKey(RatingModel, on_delete=models.CASCADE, verbose_name="Оценки", null=True, blank=True)
+
+
+
+    class Meta:
+        db_table = '"api_reviews"'
+        verbose_name = "Отзыв"
+        verbose_name_plural = "Отзывы"

@@ -1,5 +1,5 @@
 import './App.css';
-import React, {useState} from "react";
+import React, {Profiler, useState} from "react";
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import NavigateHeader from "./Components/General page/NavigateHeader";
 import Footer from "./Components/General page/Footer";
@@ -11,6 +11,7 @@ import NotFound from "./Components/General page/NotFound";
 import LoginPage from "./Components/Authorization/LoginPage";
 import RegisterPage from "./Components/Authorization/RegisterPage";
 import ForgotPage from "./Components/Authorization/ForgotPage";
+import ProfilePage from "./Components/Authorization/ProfilePage";
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
                     <Route path="/login" element={<LoginPage/>}/>
                     <Route path="/register" element={<RegisterPage/>}/>
                     <Route path="/forgot" element={<ForgotPage/>}/>
+                    <Route path="/profile/:id" element={<ProfilePage/>}/>
                     <Route path="*" element={<NotFound />} />
                 </Routes>
 

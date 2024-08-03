@@ -139,10 +139,15 @@ class GeneralInformationModelAdmin(admin.ModelAdmin):
 class PlacingRulesAdmin(admin.ModelAdmin):
     list_select_related = True
 
-class InlineReserve(admin.TabularInline):
+class InlineReserveAdmin(admin.TabularInline):
     list_select_related = True
     model = models.ReservationModel
     extra = 1
+
+class InlineReviewsAdmin(admin.TabularInline):
+    list_select_related = True
+    model = models.ReviewsModel
+    extra = 0
 
 
 @admin.register(models.ObjectRoomModel)
@@ -154,7 +159,7 @@ class ObjectRoomModel(admin.ModelAdmin):
     # autocomplete_fields = ('city', 'building_info',)  # изначальная строка
     autocomplete_fields = ('building_info',)
     raw_id_fields = ('city', 'building_info')
-    inlines = (InlineReserve,)
+    inlines = (InlineReserveAdmin, InlineReviewsAdmin)
     # list_select_related = True
 
 

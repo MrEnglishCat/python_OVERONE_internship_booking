@@ -38,11 +38,11 @@ const Search = () => {
     return (
         <div className="container ">
             <NavigateHeader token={token}/>
-            <div className="container  align-items-center justify-content-center " >
+            <div className="container  flex-auto " >
                 <div className="card bg-light text-white   rounded-5">
                     <img src="/image/background/search_background.jpg" className="card-img img-fluid   rounded-5" alt="..." style={{maxWidth: 1250}}/>
                     <div className="card-img-overlay">
-                        <div id="Search_bar"><br/>
+                        <div id="Search_bar" className="flex-auto"><br/>
                             <p className="display-2 fs-0 fw-bold text-center">Найдём, где остановиться!</p>
                             <br/>
                             <br/>

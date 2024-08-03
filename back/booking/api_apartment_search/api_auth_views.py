@@ -35,6 +35,7 @@ class RegistrationAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
+        print(request.data)
         user_serializer = CustomUserSerializer(data=request.data)
         if user_serializer.is_valid():
             user = user_serializer.save()
@@ -48,6 +49,7 @@ class RegistrationAPIView(APIView):
                 'access': str(refresh.access_token),  # Отправка на клиент
             }, status=status.HTTP_201_CREATED)
         else:
+            print(user_serializer.errors)
             return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -56,7 +58,6 @@ class LoginAPIView(APIView):
 
     def post(self, request):
         data = request.data
-        print(data)
         username = data.get('username', None)
         password = data.get('password', None)
         if username is None or password is None:
@@ -84,6 +85,7 @@ class LogoutAPIView(APIView):
 
     def post(self, request):
         refresh_token = request.data.get('refresh_token')  # С клиента нужно отправить refresh token
+
         if not refresh_token:
             return Response({'error': 'Необходим Refresh token'},
                             status=status.HTTP_400_BAD_REQUEST)
