@@ -25,9 +25,7 @@ from rest_framework_simplejwt.authentication import authentication
 
 
 # Create your views here.
-
-
-# class CitiesViewSet(viewsets.ModelViewSet):
+ # class CitiesViewSet(viewsets.ModelViewSet):
 #     queryset = models.CityModel.objects.all()
 #     serializer_class = serializers.CitySerializer
 #     filter_backends = (filters.SearchFilter,)
@@ -44,7 +42,7 @@ class RegionViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.RegionSerializer
 
 
-class UpdateRatingViewSet(APIView):  # TODO доделать
+class UpdateRatingViewSet(APIView):  # TODO переписать на новую систему оценок
     serializer_class = serializers.UpdateRatingObjectSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -79,8 +77,6 @@ class SearchMainPageViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ('title', 'city__name', 'city__country__name')
 
     def get_queryset(self):
-
-
         # Проверка токена происходит под капотом. За счет permissions.IsAuthenticated
         # request_token = self.request.META.get('HTTP_AUTHORIZATION', None)
         # if request_token:
@@ -118,3 +114,32 @@ class SearchMainPageViewSet(viewsets.ReadOnlyModelViewSet):
             return models.ObjectRoomModel.objects.none()
 
 
+class ReviewsViewSet(viewsets.ModelViewSet):
+
+    serializer_class = serializers.ReviewsSerializer
+    permission_classes = (permissions.AllowAny,)
+    # filter_backends = (filters.OrderingFilter,)
+    # ordering_fields = '__all__'  # TODO нужны для возможности сортировки отзывов
+
+    def get_queryset(self):
+        object_id = self.kwargs.get('room_object_id', None)
+
+        if object_id and object_id.isdigit():
+
+            result = models.ReviewsModel.objects.filter(room_object_id=int(object_id))
+
+            if result:
+                print(object_id, result)
+                return result
+            else:
+                return models.ObjectRoomModel.objects.none()  # TODO проработать вариант выдачи своего сообщение вместо стандартного
+
+        else :
+            return models.ReviewsModel.objects.all()
+
+
+    def retrieve(self, request, pk=None):  # TODO узнать для чего этот метод
+        print("retrieve", pk)
+        queryset = models.ReviewsModel.objects.filter(room_object_id=pk)
+        serializer = serializers.ReviewsSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

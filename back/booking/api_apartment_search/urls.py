@@ -12,6 +12,7 @@ router.register(r'countries', views.CountryViewSet, basename='countries')
 # router.register(r'regions', views.RegionViewSet, basename='regions')
 # router.register(r'cities', views.CitiesViewSet, basename='cities')
 router.register(r'search', views.SearchMainPageViewSet, basename='search')
+router.register(r'object_reviews', views.ReviewsViewSet, basename='object_reviews')
 # router.register(r'update_rating', views.UpdateRatingViewSet, basename='update_rating')
 
 

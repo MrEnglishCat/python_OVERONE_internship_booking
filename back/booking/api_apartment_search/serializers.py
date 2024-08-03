@@ -75,7 +75,23 @@ class PlasingRulesSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        # fields = "__all__"
+        fields = ("username", "id")
+
+
+
+class RatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.RatingModel
+        fields = '__all__'
+
+
 class ReviewsSerializer(serializers.ModelSerializer):
+    ratings = RatingSerializer()
+    user = CustomUserSerializer()
     class Meta:
         model = models.ReviewsModel
         fields = '__all__'
@@ -86,7 +102,6 @@ class ReviewsSerializer(serializers.ModelSerializer):
 class ObjectRoomSerializer(serializers.ModelSerializer):
     city = CitySerializer(read_only=True)
     building_info = BuildingTypeSerializer(read_only=True)
-    # general_info = serializers.CharField(source='general_info.room_square')
     general_info = GeneralInformationSerializer(read_only=True)
     images_path = ImageSerializer(read_only=True, many=True)
     placing_rules = PlasingRulesSerializer(read_only=True)
@@ -101,14 +116,10 @@ class ObjectRoomSerializer(serializers.ModelSerializer):
         )
 
 
-class ReservationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.ReservationModel
-        fields = '__all__'
-        read_only_fields = ('create_datetime',)
+# class ReservationSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = models.ReservationModel
+#         fields = '__all__'
+#         read_only_fields = ('create_datetime',)
 
 
-class CustomUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.User
-        fields = "__all__"

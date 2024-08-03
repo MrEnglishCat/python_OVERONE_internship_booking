@@ -482,8 +482,8 @@ class ObjectRoomModel(models.Model):
 
     class Meta:
         db_table = '"api_objectrooms"'
-        verbose_name_plural = 'Объекты ...?'
-        verbose_name = 'Объект  ...?'
+        verbose_name_plural = 'Объекты'
+        verbose_name = 'Объект'
 
     def __str__(self):
         return self.title
@@ -519,18 +519,18 @@ class RatingModel(models.Model):
         return f"{(self.cleanliness + self.conformity_to_photos + self.timeliness_of_check_in + self.price_quality + self.location + self.qualiti_of_service)/6}"
 
 class ReviewsModel(models.Model):
-    review_text = models.TextField(null=True, blank=True, verbose_name="Отзыв")
+    review_text = models.TextField( null=True, blank=True, verbose_name="Отзыв")
     review_created = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     review_updated = models.DateTimeField(auto_now_add=True, verbose_name="Дата редактирования")
-    likes = models.PositiveIntegerField(default=0, verbose_name="Нравится")
-    dislikes = models.PositiveIntegerField(default=0, verbose_name="Не нравится")
+    likes = models.PositiveIntegerField(default=0, verbose_name="Нравится")  # positive_sides
+    dislikes = models.PositiveIntegerField(default=0, verbose_name="Не нравится")  # negative_sides
     room_object = models.ForeignKey(ObjectRoomModel, on_delete=models.DO_NOTHING, verbose_name="Объект")
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="Пользователь")
-    ratings = models.ForeignKey(RatingModel, on_delete=models.CASCADE, verbose_name="Оценки", null=True, blank=True)
-
+    ratings = models.ForeignKey(RatingModel, on_delete=models.CASCADE, verbose_name="Оценки")
 
 
     class Meta:
         db_table = '"api_reviews"'
         verbose_name = "Отзыв"
         verbose_name_plural = "Отзывы"
+        unique_together = (( 'room_object', 'user'),)

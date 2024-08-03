@@ -3,7 +3,10 @@ import {useParams} from "react-router-dom";
 import axios from "axios";
 import Footer from "../General page/Footer";
 import NavigateHeader from "../General page/NavigateHeader";
-import Booking from "./Booking"
+import Booking from "./Booking";
+import Reviews from "./reviews/Reviews";
+
+
 
 const Card = (props) => {
 
@@ -29,8 +32,7 @@ const Card = (props) => {
                         <p><img src="/image/otherIcons/red_star_rating.png"
                                 width="30"
                                 height="20"/><span className="fw-bold">{Number(props.item.rating).toFixed(1)}</span>
-                            &nbsp;( 88
-                            отзывов_HC
+                            &nbsp;( {props.reviews.length} отзывов(-ва)
                             ) {props.item.address ? `${props.item.city.name}, ${props.item.address.street_type} ${props.item.address.street_name} ${props.item.address.building_number} ${props.item.address.corps ? props.item.address.corps : ""}` : ""}
                         </p>
 
@@ -157,6 +159,29 @@ const Card = (props) => {
                             </ul>
 
                         </div>
+                        <br/>
+                        <div className="item-details shadow-lg p-3  rounded-5">
+                            <div className="item-details-info">
+
+                                <span className="fs-3 fw-bold">Оценка гостей<img
+                                    src="/image/otherIcons/red_star_rating.png"
+                                    width="30"
+                                    height="20"/>
+                                    <span className="fw-bold">
+                                        {Number(props.item.rating).toFixed(1)} рейтинг из старой системы
+                                    </span>
+                                </span>
+                                {(props.reviews.length > 0) ?
+                                    <span className="fs-6">
+                                            &nbsp;( {props.reviews.length} отзывов(-ва) )
+                                    </span> : <p>Пока что  отзывов нету. Вы можете быть первым!</p>}
+                                {(props.reviews.length > 0) ? <Reviews reviews={props.reviews}/> : ""}
+
+
+
+                            </div>
+                        </div>
+
                         {/*<Link to="/" className="go-back-button">Go Back</Link>*/}
                     </div>
                 </div>

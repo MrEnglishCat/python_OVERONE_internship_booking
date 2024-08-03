@@ -12,7 +12,9 @@ const DetailCard = (props) => {
     // const navigate = useNavigate();
     const {id} = useParams();
     const [ObjectRoom, setObjectRoom] = useState({});
+    const [reviews, setReviews] = useState({});
     const API_URL_ID = "http://127.0.0.1:8000/api/v1/search/"
+    const API_REVIEWS = "http://127.0.0.1:8000/api/v1/object_reviews/"
     const HEADERS = {
         'Accept': '*/*',
         // "Authorization": `Bearer ${sessionStorage.getItem("auth_token")}`
@@ -27,6 +29,13 @@ const DetailCard = (props) => {
                     }).catch((error) => {
                         console.log(error);
                     })
+
+                const response_reviews = await axios.get(API_REVIEWS + id + '/', {headers: HEADERS})
+                    .then((response) => {
+                        setReviews(response.data)
+                    }).catch((error) => {
+                        console.log(error);
+                    })
             };
             getData()
         },[]);
@@ -35,7 +44,7 @@ const DetailCard = (props) => {
     return (
         <div>
             <NavigateHeader/>
-             <Card item={ObjectRoom}/>
+             <Card item={ObjectRoom} reviews={reviews}/>
             <Footer/>
         </div>
 

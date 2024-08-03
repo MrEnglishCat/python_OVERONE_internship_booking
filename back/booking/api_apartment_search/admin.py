@@ -149,6 +149,10 @@ class InlineReviewsAdmin(admin.TabularInline):
     model = models.ReviewsModel
     extra = 0
 
+@admin.register(models.RatingModel)
+class RatingAdmin(admin.ModelAdmin):
+    list_select_related = True
+
 
 @admin.register(models.ObjectRoomModel)
 class ObjectRoomModel(admin.ModelAdmin):
