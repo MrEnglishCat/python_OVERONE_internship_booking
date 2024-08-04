@@ -1,12 +1,13 @@
 import React, {Component, useState, useEffect, Link} from "react";
-import {useParams} from "react-router-dom";
+import {Route, Routes, useParams} from "react-router-dom";
 import axios from "axios";
 import Footer from "../General page/Footer";
 import NavigateHeader from "../General page/NavigateHeader";
 import Booking from "./Booking";
 import Reviews from "./reviews/Reviews";
-
-
+import TotalStars from "./reviews/TotalStars";
+import DetailCard from "./DetailCard";
+import LoginPage from "../Authorization/LoginPage";
 
 const Card = (props) => {
 
@@ -29,11 +30,24 @@ const Card = (props) => {
                 <div className="col-lg-8">
                     <div className="item-details-container row-fluid">
                         <h2 className="item-details-heading">{props.item.title}</h2>
-                        <p><img src="/image/otherIcons/red_star_rating.png"
-                                width="30"
-                                height="20"/><span className="fw-bold">{Number(props.item.rating).toFixed(1)}</span>
-                            &nbsp;( {props.reviews.length} отзывов(-ва)
-                            ) {props.item.address ? `${props.item.city.name}, ${props.item.address.street_type} ${props.item.address.street_name} ${props.item.address.building_number} ${props.item.address.corps ? props.item.address.corps : ""}` : ""}
+
+                        <p>
+                            {(props.reviews.length > 0) ?
+                                <span>
+                                <img src="/image/otherIcons/red_star_rating.png"
+                                     width="30"
+                                     height="20"/>
+                                <span className="fw-bold">
+                                     {Number(props.item.rating).toFixed(1)}
+                                </span>
+                                <span className="text-secondary">
+                                &nbsp;( {props.reviews.length} отзывов(-ва) )&nbsp;
+                                </span>
+                            </span>
+                                : ""}
+                            <span className="text-secondary">
+                             {props.item.address ? `${props.item.city.name}, ${props.item.address.street_type} ${props.item.address.street_name} ${props.item.address.building_number} ${props.item.address.corps ? props.item.address.corps : ""}` : ""}
+                            </span>
                         </p>
 
                         <div className="container ">
@@ -162,21 +176,31 @@ const Card = (props) => {
                         <br/>
                         <div className="item-details shadow-lg p-3  rounded-5">
                             <div className="item-details-info">
+                                <span className="fs-3 fw-bold img-fluid">Оценка гостей
+                                    {(props.reviews.length > 0) ?
+                                        <img
+                                            src="/image/otherIcons/red_star_rating.png"
+                                            width="30"
+                                            height="20"/>
 
-                                <span className="fs-3 fw-bold">Оценка гостей<img
-                                    src="/image/otherIcons/red_star_rating.png"
-                                    width="30"
-                                    height="20"/>
-                                    <span className="fw-bold">
-                                        {Number(props.item.rating).toFixed(1)} рейтинг из старой системы
-                                    </span>
+                                        : ""}
+
+
                                 </span>
-                                {(props.reviews.length > 0) ?
-                                    <span className="fs-6">
-                                            &nbsp;( {props.reviews.length} отзывов(-ва) )
-                                    </span> : <p>Пока что  отзывов нету. Вы можете быть первым!</p>}
-                                {(props.reviews.length > 0) ? <Reviews reviews={props.reviews}/> : ""}
 
+                                {(props.reviews.length > 0) ?
+                                    <span className="fs-6 text-secondary">
+                                            &nbsp;( {props.reviews.length} отзывов(-ва) )
+                                    </span> :
+                                    <p>Пока что отзывов нету. Вы можете быть первым!
+                                        {/*<Link to="/login" className="float-end">*/}
+                                        {/*    Авторизуйтесь*/}
+                                        {/*</Link>, что бы оставить отзыв</p>*/}
+                                </p>
+                                }
+
+                                {(props.reviews.length > 0) ? <span><TotalStars item={props.item.id}/><Reviews
+                                    reviews={props.reviews}/></span> : ""}
 
 
                             </div>
@@ -189,9 +213,16 @@ const Card = (props) => {
                     <Booking prepayment={props.item.prepayment} payment_day={props.item.payment_day}/>
                 </div>
             </div>
+            <Routes>
+                <Route
+                    path="/login"
+                    render={(props) => <LoginPage props/>}
+                />
+            </Routes>
         </div>
 
-    );
+    )
+        ;
 };
 
 export default Card;
