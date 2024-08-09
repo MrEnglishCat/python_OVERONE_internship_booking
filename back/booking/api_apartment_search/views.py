@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from django.shortcuts import render
-from django.db.models import Q, Count, ExpressionWrapper, F, FloatField
+from django.db.models import Q, Count, ExpressionWrapper, F, FloatField, Avg
+
 from django.db.models.functions.comparison import NullIf
 from rest_framework import viewsets, filters, permissions, status
 from rest_framework.decorators import action
@@ -10,6 +11,7 @@ from rest_framework.views import APIView, exception_handler
 
 from . import models
 from . import serializers
+
 from .api_auth_views import RegistrationAPIView, LoginAPIView, LogoutAPIView, ResetTokenAPIView
 
 # для JWT-токена
@@ -139,7 +141,36 @@ class ReviewsViewSet(viewsets.ModelViewSet):
 
 
     def retrieve(self, request, pk=None):  # TODO узнать для чего этот метод
-        print("retrieve", pk)
         queryset = models.ReviewsModel.objects.filter(room_object_id=pk)
         serializer = serializers.ReviewsSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+class AllStarsObjectRoomViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = serializers.AllStarsObjectRoomSerializer
+    permission_classes = (permissions.AllowAny,)
+    queryset = models.RatingModel.objects.all()
+
+    # def get_queryset(self):
+    #     object_id = self.kwargs.get('room_object_id', None)
+    #     print(object_id)
+    #     if object_id:
+    #         result = models.RatingModel.objects.filter(obje=object_id)
+    #         if result:
+    #             return result
+    #         else:
+    #             return models.RatingModel.objects.none()
+    #     else:
+    #         return models.RatingModel.objects.none()
+
+    def retrieve(self, request, pk=None):  # TODO узнать для чего этот метод
+        queryset = models.RatingModel.objects.filter(object_room_id=pk).aggregate(
+            Avg("cleanliness", default=0),
+            Avg("conformity_to_photos", default=0),
+            Avg("timeliness_of_check_in", default=0),
+            Avg("price_quality", default=0),
+            Avg("location", default=0),
+            Avg("quality_of_service", default=0),
+        )
+        return Response(queryset, status=status.HTTP_200_OK)

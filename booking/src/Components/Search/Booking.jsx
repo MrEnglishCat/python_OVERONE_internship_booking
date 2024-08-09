@@ -110,12 +110,14 @@ const Booking = (props) => {
                                 <input id="endDate" className="form-control" type="date" placeholder="Отъезд"/>
                             </div>
                         </div>
+                        <br/>
                         <p>Предоплата: {props.prepayment} BYN (~{(props.prepayment / exchangeUSD).toFixed(2)} USD)</p>
                         <p><span>Оплата за сутки:</span> {props.payment_day} BYN
                             (~{(props.payment_day / exchangeUSD).toFixed(2)} USD)</p>
 
                         <p>Оплата при заселении: {props.payment_day - props.prepayment} BYN
                             (~{((props.payment_day - props.prepayment) / exchangeUSD).toFixed(2)} USD)</p>
+                        <hr/>
                         <p>Курс НБ РБ на {getDate()}: 1 USD - {exchangeUSD} BYN</p>
                         <br/>
                         {/*<div className="position-fixed">...</div>*/}

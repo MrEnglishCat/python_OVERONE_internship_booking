@@ -1,9 +1,12 @@
 import React, {Component, useState, useEffect, Link} from "react";
 import {useParams} from "react-router-dom";
 import axios from "axios";
+import UserReviewStar from "./UserReviewStar";
 
 
 const Review = (props) => {
+
+
     return (
         <div className="container-fluid">
 
@@ -26,17 +29,18 @@ const Review = (props) => {
                                 d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857z"/>
                             <path
                                 d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
-                        </svg> <span className="fs-6">{props.item.review_updated}</span>
+                        </svg>
+                        <span className="fs-6">{props.item.review_updated}</span>
                     </div>
 
                 </div>
                 <div className="col text-end">
                     <div className="row-2">
                         <img
-                        src="/image/otherIcons/red_star_rating.png"
-                        width="30"
-                        height="20"
-                    />2.4
+                            src="/image/otherIcons/red_star_rating.png"
+                            width="30"
+                            height="20"
+                        /> <UserReviewStar rating={props.item.ratings}/>
                     </div>
                     <div className="row-2">
                         дата заезда

@@ -12,7 +12,7 @@ import LoginPage from "../Authorization/LoginPage";
 const Card = (props) => {
 
     // получаем параметры
-    console.log('PROPS', props.item);
+    // console.log('PROPS', props.item);
 
     const ConvertDatetime = (datetime) => {
         let objectDT = new Date(datetime);
@@ -22,6 +22,28 @@ const Card = (props) => {
         let time = `${objectDT.getHours()}:${objectDT.getMinutes()}`;
         return `${day}-${month}-${year}`;
     };
+
+    const API_ALL_STARTS_RATING = "http://127.0.0.1:8000/api/v1/get_object_rating/"
+    const [stars, setStars] = useState({})
+    const HEADERS = {
+        'Accept': '*/*',
+        // "Authorization": `Bearer ${sessionStorage.getItem("auth_token")}`
+    };
+
+
+    useEffect(
+        () => {
+            async function getStars() {
+                const response = await axios.get(API_ALL_STARTS_RATING + props.item.id + '/', {headers: HEADERS})
+                    .then((response) => {
+                        setStars(response.data);
+                    }).catch((error) => {
+                        console.log(error);
+                    });
+            };
+            getStars();
+        }, [props.item.id]
+    );
 
 
     return (
@@ -33,20 +55,30 @@ const Card = (props) => {
 
                         <p>
                             {(props.reviews.length > 0) ?
-                                <span>
-                                <img src="/image/otherIcons/red_star_rating.png"
-                                     width="30"
-                                     height="20"/>
-                                <span className="fw-bold">
-                                     {Number(props.item.rating).toFixed(1)}
-                                </span>
-                                <span className="text-secondary">
-                                &nbsp;( {props.reviews.length} отзывов(-ва) )&nbsp;
-                                </span>
-                            </span>
-                                : ""}
+                                        <span  className="fw-bold img-fluid">
+                                            <img
+                                                src="/image/otherIcons/red_star_rating.png"
+                                                width="30"
+                                                height="20"/>
+                                            {
+                                                stars ?
+                                                    (
+                                                        (
+                                                            stars.cleanliness__avg +
+                                                            stars.conformity_to_photos__avg +
+                                                            stars.price_quality__avg +
+                                                            stars.location__avg +
+                                                            stars.quality_of_service__avg +
+                                                            stars.timeliness_of_check_in__avg
+                                                        ) / 6
+                                                    ).toFixed(1)
+                                                    : ""
+                                            }
+                                        </span>
+                                        : ""
+                                    }
                             <span className="text-secondary">
-                             {props.item.address ? `${props.item.city.name}, ${props.item.address.street_type} ${props.item.address.street_name} ${props.item.address.building_number} ${props.item.address.corps ? props.item.address.corps : ""}` : ""}
+                              &nbsp;{props.item.address ? `${props.item.city.name}, ${props.item.address.street_type} ${props.item.address.street_name} ${props.item.address.building_number} ${props.item.address.corps ? props.item.address.corps : ""}` : ""}
                             </span>
                         </p>
 
@@ -176,33 +208,44 @@ const Card = (props) => {
                         <br/>
                         <div className="item-details shadow-lg p-3  rounded-5">
                             <div className="item-details-info">
-                                <span className="fs-3 fw-bold img-fluid">Оценка гостей
+                                <span className="fs-3 fw-bold img-fluid">Оценка гостей</span>
+                                <span>
                                     {(props.reviews.length > 0) ?
-                                        <img
-                                            src="/image/otherIcons/red_star_rating.png"
-                                            width="30"
-                                            height="20"/>
+                                        <span  className="fs-5 fw-bold img-fluid">
+                                            <img
+                                                src="/image/otherIcons/red_star_rating.png"
+                                                width="40"
+                                                height="30"/>
+                                            {
+                                                stars ?
+                                                    (
+                                                        (
+                                                            stars.cleanliness__avg +
+                                                            stars.conformity_to_photos__avg +
+                                                            stars.price_quality__avg +
+                                                            stars.location__avg +
+                                                            stars.quality_of_service__avg +
+                                                            stars.timeliness_of_check_in__avg
+                                                        ) / 6
+                                                    ).toFixed(1)
+                                                    : ""
+                                            }
+                                        </span>
+                                        : <p>Пока что отзывов нету. Будьте первым! <br/>
+                                            <a href="/login">Авторизуйтесь</a> для того что бы оставить отзыв!
 
-                                        : ""}
+                                            </p>
 
+                                    }
 
                                 </span>
-
-                                {(props.reviews.length > 0) ?
-                                    <span className="fs-6 text-secondary">
-                                            &nbsp;( {props.reviews.length} отзывов(-ва) )
-                                    </span> :
-                                    <p>Пока что отзывов нету. Вы можете быть первым!
-                                        {/*<Link to="/login" className="float-end">*/}
-                                        {/*    Авторизуйтесь*/}
-                                        {/*</Link>, что бы оставить отзыв</p>*/}
-                                </p>
+                                {
+                                    (props.reviews.length > 0) ?
+                                        <span>
+                                                <TotalStars star={stars}/>
+                                                <Reviews reviews={props.reviews}/>
+                                            </span> : ""
                                 }
-
-                                {(props.reviews.length > 0) ? <span><TotalStars item={props.item.id}/><Reviews
-                                    reviews={props.reviews}/></span> : ""}
-
-
                             </div>
                         </div>
 
@@ -221,8 +264,8 @@ const Card = (props) => {
             </Routes>
         </div>
 
-    )
-        ;
+)
+;
 };
 
 export default Card;

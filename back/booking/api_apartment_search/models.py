@@ -508,7 +508,8 @@ class RatingModel(models.Model):
     timeliness_of_check_in = models.PositiveSmallIntegerField(default=0, verbose_name="Своевременность заселения")
     price_quality = models.PositiveSmallIntegerField(default=0, verbose_name="Цена-качество")
     location = models.PositiveSmallIntegerField(default=0, verbose_name="Расположение")
-    qualiti_of_service = models.PositiveSmallIntegerField(default=0, verbose_name="Качество обслуживания")
+    quality_of_service = models.PositiveSmallIntegerField(default=0, verbose_name="Качество обслуживания")
+    object_room = models.ForeignKey(ObjectRoomModel, on_delete=models.DO_NOTHING, null=True, blank=True, verbose_name="Объект")
 
     class Meta:
         db_table = '"api_ratings"'
@@ -516,7 +517,7 @@ class RatingModel(models.Model):
         verbose_name_plural = "Оценки"
 
     def __str__(self):
-        return f"{(self.cleanliness + self.conformity_to_photos + self.timeliness_of_check_in + self.price_quality + self.location + self.qualiti_of_service)/6}"
+        return f"{(self.cleanliness + self.conformity_to_photos + self.timeliness_of_check_in + self.price_quality + self.location + self.quality_of_service)/6}"
 
 class ReviewsModel(models.Model):
     review_text = models.TextField( null=True, blank=True, verbose_name="Отзыв")
@@ -534,3 +535,4 @@ class ReviewsModel(models.Model):
         verbose_name = "Отзыв"
         verbose_name_plural = "Отзывы"
         unique_together = (( 'room_object', 'user'),)
+

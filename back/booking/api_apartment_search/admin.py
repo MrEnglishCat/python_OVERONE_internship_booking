@@ -3,6 +3,7 @@ from . import models
 from django.contrib.admin.views.main import ChangeList
 from django.core.paginator import EmptyPage, InvalidPage, Paginator
 
+
 # Register your models here.
 
 
@@ -34,7 +35,7 @@ class InlineCityAdmin(admin.TabularInline):
     list_display = ('id', 'name', 'country', 'region')
     search_fields = ('id', 'name', 'country__name', 'region__name')
     autocomplete_fields = ('country', 'region',)
-    list_filter = ()
+    list_filter = ("name", "country__name", "region__name")
     # list_per_page = 10
     # list_max_show_all = 200
     extra = 1
@@ -74,6 +75,15 @@ class InlineCityAdmin(admin.TabularInline):
         return PaginationFormSet
 
 
+@admin.register(models.CityModel)
+class CityAdmin(admin.ModelAdmin):
+    list_display = ('name', 'country', 'region')
+    search_fields = ('name', 'country__name', 'region__name')
+    autocomplete_fields = ('country', 'region',)
+    list_filter = ("name", "country__name", "region__name")
+    per_page = 20
+
+
 @admin.register(models.CountryModel)
 class CountryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
@@ -90,19 +100,17 @@ class RegionAdmin(admin.ModelAdmin):
     autocomplete_fields = ('country',)
 
 
-
-
 # @admin.register(models.AddressModel)
 # class AddressAdmin(admin.ModelAdmin):
 #     list_select_related = True
 
 
-
 class InlineAddressAdmin(admin.TabularInline):
     model = models.AddressModel
-    list_display = ('id', 'street_type', 'street_name', 'building_number', 'corps', 'location', )
+    list_display = ('id', 'street_type', 'street_name', 'building_number', 'corps', 'location',)
     list_select_related = True
     extra = 1
+
 
 @admin.register(models.StreetTypeModel)
 class StreetTypeAdmin(admin.ModelAdmin):
@@ -139,15 +147,25 @@ class GeneralInformationModelAdmin(admin.ModelAdmin):
 class PlacingRulesAdmin(admin.ModelAdmin):
     list_select_related = True
 
+
 class InlineReserveAdmin(admin.TabularInline):
     list_select_related = True
     model = models.ReservationModel
     extra = 1
 
+
+# class InlineRatingAdmin(admin.TabularInline):
+#     list_select_related = True
+#     readonly_fields = "__all__"
+#     model = models.RatingModel
+
+
 class InlineReviewsAdmin(admin.TabularInline):
     list_select_related = True
     model = models.ReviewsModel
     extra = 0
+    # inlines = (InlineRatingAdmin,)
+
 
 @admin.register(models.RatingModel)
 class RatingAdmin(admin.ModelAdmin):
@@ -161,9 +179,7 @@ class ObjectRoomModel(admin.ModelAdmin):
     list_display_links = ('title',)
     search_fields = ('id', 'title',)
     # autocomplete_fields = ('city', 'building_info',)  # изначальная строка
-    autocomplete_fields = ('building_info',)
+    autocomplete_fields = ('building_info', "city")
     raw_id_fields = ('city', 'building_info')
     inlines = (InlineReserveAdmin, InlineReviewsAdmin)
     # list_select_related = True
-
-

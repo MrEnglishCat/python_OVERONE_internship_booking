@@ -123,3 +123,8 @@ class ObjectRoomSerializer(serializers.ModelSerializer):
 #         read_only_fields = ('create_datetime',)
 
 
+class AllStarsObjectRoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.RatingModel
+        fields = '__all__'
+

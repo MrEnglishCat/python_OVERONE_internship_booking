@@ -5,7 +5,7 @@ import Review from "./Review";
 import BriefItemCard from "../BriefItemCard";
 
 const Reviews = (props) => {
-    console.log(props.reviews);
+    // console.log(props.reviews);
     return (
         <div className="container">
             {props.reviews.length !== 0 ? props.reviews.map((item) =>
