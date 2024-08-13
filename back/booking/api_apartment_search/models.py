@@ -465,11 +465,11 @@ class ObjectRoomModel(models.Model):
 
     general_info = models.ForeignKey(GeneralInformationModel, on_delete=models.CASCADE, null=True, blank=True)
     # TODO в дальнейшем добавить возможность оценивать разные показатели и выводить среднее значение между всеми показателями
-    rating = models.DecimalField(default=0, decimal_places=4, max_digits=7, validators=(MinValueValidator(0.0),
-                                                                                        MaxValueValidator(
-                                                                                            10.0)))  # TODO рассмотреть в дальнешем вынести оценку в отдельную таблицу с большим количеством критериев
-    votes = models.PositiveBigIntegerField(default=0)
-    rating_sum = models.DecimalField(default=0, decimal_places=4, max_digits=7)
+    # rating = models.DecimalField(default=0, decimal_places=4, max_digits=7, validators=(MinValueValidator(0.0),
+    #                                                                                     MaxValueValidator(
+    #                                                                                         10.0)))  # TODO рассмотреть в дальнешем вынести оценку в отдельную таблицу с большим количеством критериев
+    # votes = models.PositiveBigIntegerField(default=0)
+    # rating_sum = models.DecimalField(default=0, decimal_places=4, max_digits=7)
     building_info = models.ForeignKey(BuildingTypeModel, on_delete=models.DO_NOTHING)
 
     city = models.ForeignKey(CityModel, on_delete=models.DO_NOTHING)
@@ -503,12 +503,12 @@ class ReservationModel(models.Model):
 
 
 class RatingModel(models.Model):
-    cleanliness = models.PositiveSmallIntegerField(default=0, verbose_name="Чистота")
-    conformity_to_photos = models.PositiveSmallIntegerField(default=0, verbose_name="Соответствие фото")
-    timeliness_of_check_in = models.PositiveSmallIntegerField(default=0, verbose_name="Своевременность заселения")
-    price_quality = models.PositiveSmallIntegerField(default=0, verbose_name="Цена-качество")
-    location = models.PositiveSmallIntegerField(default=0, verbose_name="Расположение")
-    quality_of_service = models.PositiveSmallIntegerField(default=0, verbose_name="Качество обслуживания")
+    cleanliness = models.PositiveSmallIntegerField(default=0, validators=(MinValueValidator(0.0), MaxValueValidator(10.0)), verbose_name="Чистота")
+    conformity_to_photos = models.PositiveSmallIntegerField(default=0, validators=(MinValueValidator(0.0), MaxValueValidator(10.0)), verbose_name="Соответствие фото")
+    timeliness_of_check_in = models.PositiveSmallIntegerField(default=0, validators=(MinValueValidator(0.0), MaxValueValidator(10.0)), verbose_name="Своевременность заселения")
+    price_quality = models.PositiveSmallIntegerField(default=0, validators=(MinValueValidator(0.0), MaxValueValidator(10.0)), verbose_name="Цена-качество")
+    location = models.PositiveSmallIntegerField(default=0, validators=(MinValueValidator(0.0), MaxValueValidator(10.0)), verbose_name="Расположение")
+    quality_of_service = models.PositiveSmallIntegerField(default=0, validators=(MinValueValidator(0.0), MaxValueValidator(10.0)), verbose_name="Качество обслуживания")
     object_room = models.ForeignKey(ObjectRoomModel, on_delete=models.DO_NOTHING, null=True, blank=True, verbose_name="Объект")
 
     class Meta:

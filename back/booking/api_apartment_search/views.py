@@ -148,7 +148,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
 
 
 class AllStarsObjectRoomViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.AllStarsObjectRoomSerializer
+    # serializer_class = serializers.AllStarsObjectRoomSerializer
     permission_classes = (permissions.AllowAny,)
     queryset = models.RatingModel.objects.all()
 
@@ -174,3 +174,32 @@ class AllStarsObjectRoomViewSet(viewsets.ReadOnlyModelViewSet):
             Avg("quality_of_service", default=0),
         )
         return Response(queryset, status=status.HTTP_200_OK)
+
+
+class GetCountOfReviewViewset(viewsets.ReadOnlyModelViewSet):
+
+    serializer_class = serializers.ReviewsSerializer
+    permission_classes = (permissions.AllowAny,)
+    # filter_backends = (filters.OrderingFilter,)
+    # ordering_fields = '__all__'  # TODO нужны для возможности сортировки отзывов
+
+    def get_queryset(self):
+        object_id = self.kwargs.get('room_object_id', None)
+
+        if object_id and object_id.isdigit():
+
+            result = models.ReviewsModel.objects.filter(room_object_id=int(object_id))
+
+            if result:
+                print(object_id, result)
+                return result
+            else:
+                return models.ObjectRoomModel.objects.none()  # TODO проработать вариант выдачи своего сообщение вместо стандартного
+
+        else :
+            return models.ReviewsModel.objects.all()
+
+
+    def retrieve(self, request, pk=None):  # TODO узнать для чего этот метод
+        queryset = models.ReviewsModel.objects.filter(room_object_id=pk).count()
+        return Response({"reviews_count":queryset}, status=status.HTTP_200_OK)

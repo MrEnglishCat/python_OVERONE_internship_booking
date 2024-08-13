@@ -14,6 +14,7 @@ router.register(r'countries', views.CountryViewSet, basename='countries')
 router.register(r'search', views.SearchMainPageViewSet, basename='search')
 router.register(r'object_reviews', views.ReviewsViewSet, basename='object_reviews')
 router.register(r'get_object_rating', views.AllStarsObjectRoomViewSet, basename='get_object_rating')
+router.register(r'get_count_of_views', views.GetCountOfReviewViewset, basename='get_count_of_views')
 
 # router.register(r'update_rating', views.UpdateRatingViewSet, basename='update_rating')
 

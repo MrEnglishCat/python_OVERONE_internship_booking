@@ -1,6 +1,7 @@
-import React, {Component, useState} from "react";
+import React, {Component, useEffect, useState} from "react";
 import {Route, useParams, Link, Routes} from "react-router-dom";
 import DetailCard from "./DetailCard";
+import axios from "axios";
 
 const BriefItemCard = (props) => {
     const [objectRooms, setObjectRooms] = useState([]);
@@ -12,6 +13,45 @@ const BriefItemCard = (props) => {
         let time = `${objectDT.getHours()}:${objectDT.getMinutes()}`;
         return `${day}-${month}-${year} ${time}`;
     }
+
+    const API_ALL_STARTS_RATING = "http://127.0.0.1:8000/api/v1/get_object_rating/"
+    const API_REVIEWS_COUNT = "http://127.0.0.1:8000/api/v1/get_count_of_views/"
+    const [stars, setStars] = useState({})
+    const [countReviews, setCountReviews] = useState({});
+    const HEADERS = {
+        'Accept': '*/*',
+        // "Authorization": `Bearer ${sessionStorage.getItem("auth_token")}`
+    };
+
+
+    useEffect(
+        () => {
+            async function getStars() {
+                const response = await axios.get(API_ALL_STARTS_RATING + props.item.id + '/', {headers: HEADERS})
+                    .then((response) => {
+                        setStars(response.data);
+                    }).catch((error) => {
+                        console.log(error);
+                    });
+            };
+
+            async function getLenghtReviews() {
+                const response = await axios.get(API_REVIEWS_COUNT + props.item.id + '/', {headers: HEADERS})
+                    .then((response) => {
+                        setCountReviews(response.data);
+                    }).catch((error) => {
+                        console.log(error);
+                    });
+            };
+
+
+            getStars();
+            getLenghtReviews();
+        }, [props.item.id]
+    );
+
+
+    console.log(props.item)
 
     return (
         <div key={props.item.id}>
@@ -29,10 +69,12 @@ const BriefItemCard = (props) => {
                                          alt="..."/>
                                 </div>
                                 <div className="carousel-item">
-                                    <img src="image/user_objects/1/2.webp" className="d-block img-fluid rounded-5" alt="..."/>
+                                    <img src="image/user_objects/1/2.webp" className="d-block img-fluid rounded-5"
+                                         alt="..."/>
                                 </div>
                                 <div className="carousel-item">
-                                    <img src="image/user_objects/1/3.webp" className="d-block img-fluid rounded-5" alt="..."/>
+                                    <img src="image/user_objects/1/3.webp" className="d-block img-fluid rounded-5"
+                                         alt="..."/>
                                 </div>
                             </div>
                             <button className="carousel-control-prev" type="button"
@@ -53,7 +95,8 @@ const BriefItemCard = (props) => {
                         {/*     width="100%" height="auto"/>*/}
                     </div>
                     <div className="col-md-9">
-                        <Link to={`/search/${props.item.id}/`} state={props} className="link-dark link-offset-2 link-underline link-underline-opacity-0">
+                        <Link to={`/search/${props.item.id}/`} state={props}
+                              className="link-dark link-offset-2 link-underline link-underline-opacity-0">
                             <div className="card-body">
                                 <div className=" card-text">
                                     <div class="container-fluid">
@@ -100,9 +143,29 @@ const BriefItemCard = (props) => {
                                                                     d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
                                                             </svg>
                                                             {props.item.address ? `${props.item.city.name}, ${props.item.address.street_type} ${props.item.address.street_name} ${props.item.address.building_number} ${props.item.address.corps ? `к${props.item.address.corps}` : ""}` : ""}
-                                                            <br/><span
-                                                            className="badge text-bg-success text-wrap">{Number(props.item.rating).toFixed(1)}</span> "88 отзывов"
-                                                        </span>
+                                                            <br/>
+                                                            <span className="badge text-bg-success text-wrap">
+                                                            {
+                                                                stars ?
+                                                                    (
+                                                                        (
+                                                                            stars.cleanliness__avg +
+                                                                            stars.conformity_to_photos__avg +
+                                                                            stars.price_quality__avg +
+                                                                            stars.location__avg +
+                                                                            stars.quality_of_service__avg +
+                                                                            stars.timeliness_of_check_in__avg
+                                                                        ) / 6
+                                                                    ).toFixed(1)
+                                                                    : ""
+                                                            }
+                                                            </span>
+
+                                                            &nbsp;<span className="text-secondary">
+                                                                    {countReviews.reviews_count} отзыва
+                                                                 </span>
+                                                            </span>
+
                                                     </div>
                                                 </div>
 

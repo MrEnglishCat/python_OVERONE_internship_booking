@@ -92,6 +92,8 @@ class RatingSerializer(serializers.ModelSerializer):
 class ReviewsSerializer(serializers.ModelSerializer):
     ratings = RatingSerializer()
     user = CustomUserSerializer()
+    review_updated = serializers.DateTimeField(format="%d-%m-%Y %H:%M")
+    review_created = serializers.DateTimeField(format="%d-%m-%Y %H:%M")
     class Meta:
         model = models.ReviewsModel
         fields = '__all__'
@@ -110,8 +112,6 @@ class ObjectRoomSerializer(serializers.ModelSerializer):
         model = models.ObjectRoomModel
 
         exclude = (
-            "votes",
-            "rating_sum",
             "create_datetime",
         )
 

@@ -61,8 +61,9 @@ const NavigateHeader = (token) => {
         if (response.ok) {
             console.log("REFRESH", response.ok);
             sessionStorage.removeItem("auth_token");
-            let tk = JSON.stringify(await response.json())
-            sessionStorage.setItem("auth_token", tk);
+            let tk = await response.json();
+            tk["refresh"] = refresh_token;
+            sessionStorage.setItem("auth_token", JSON.stringify(tk));
         } else {
             console.log("REFRESH", response);
             sessionStorage.removeItem("auth_token");
@@ -133,6 +134,7 @@ const NavigateHeader = (token) => {
             navigate(0)
         } else {
             console.log("LOGOUT", response)
+            navigate(0)
         }
         // navigate(0)
     }

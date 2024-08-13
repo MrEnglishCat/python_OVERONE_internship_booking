@@ -8,6 +8,7 @@ import Reviews from "./reviews/Reviews";
 import TotalStars from "./reviews/TotalStars";
 import DetailCard from "./DetailCard";
 import LoginPage from "../Authorization/LoginPage";
+import SendReview from "./reviews/SendReview";
 
 const Card = (props) => {
 
@@ -25,6 +26,8 @@ const Card = (props) => {
 
     const API_ALL_STARTS_RATING = "http://127.0.0.1:8000/api/v1/get_object_rating/"
     const [stars, setStars] = useState({})
+    const [datetime, setDateTime] = useState();
+
     const HEADERS = {
         'Accept': '*/*',
         // "Authorization": `Bearer ${sessionStorage.getItem("auth_token")}`
@@ -42,6 +45,10 @@ const Card = (props) => {
                     });
             };
             getStars();
+
+            let dt = new Date();
+            console.log(dt);
+// props.item.review_updated
         }, [props.item.id]
     );
 
@@ -55,28 +62,36 @@ const Card = (props) => {
 
                         <p>
                             {(props.reviews.length > 0) ?
-                                        <span  className="fw-bold img-fluid">
-                                            <img
-                                                src="/image/otherIcons/red_star_rating.png"
-                                                width="30"
-                                                height="20"/>
-                                            {
-                                                stars ?
+                                <span>
+                                    <span className="fw-bold img-fluid">
+                                                <img
+                                                    src="/image/otherIcons/red_star_rating.png"
+                                                    width="30"
+                                                    height="20"/>
+                                        {
+                                            stars ?
+                                                (
                                                     (
-                                                        (
-                                                            stars.cleanliness__avg +
-                                                            stars.conformity_to_photos__avg +
-                                                            stars.price_quality__avg +
-                                                            stars.location__avg +
-                                                            stars.quality_of_service__avg +
-                                                            stars.timeliness_of_check_in__avg
-                                                        ) / 6
-                                                    ).toFixed(1)
-                                                    : ""
-                                            }
+                                                        stars.cleanliness__avg +
+                                                        stars.conformity_to_photos__avg +
+                                                        stars.price_quality__avg +
+                                                        stars.location__avg +
+                                                        stars.quality_of_service__avg +
+                                                        stars.timeliness_of_check_in__avg
+                                                    ) / 6
+                                                ).toFixed(1)
+                                                : ""
+                                        }
+
+                                    </span>
+                                    <span>
+                                    &nbsp;<span className="text-secondary">
+                                            {props.reviews.length} отзыва
                                         </span>
-                                        : ""
-                                    }
+                                    </span>
+                                </span>
+                                : ""
+                            }
                             <span className="text-secondary">
                               &nbsp;{props.item.address ? `${props.item.city.name}, ${props.item.address.street_type} ${props.item.address.street_name} ${props.item.address.building_number} ${props.item.address.corps ? props.item.address.corps : ""}` : ""}
                             </span>
@@ -211,41 +226,60 @@ const Card = (props) => {
                                 <span className="fs-3 fw-bold img-fluid">Оценка гостей</span>
                                 <span>
                                     {(props.reviews.length > 0) ?
-                                        <span  className="fs-5 fw-bold img-fluid">
-                                            <img
-                                                src="/image/otherIcons/red_star_rating.png"
-                                                width="40"
-                                                height="30"/>
-                                            {
-                                                stars ?
-                                                    (
+                                        <span>
+                                            <span className="fs-5 fw-bold img-fluid">
+                                                <img
+                                                    src="/image/otherIcons/red_star_rating.png"
+                                                    width="40"
+                                                    height="30"/>
+                                                {
+                                                    stars ?
                                                         (
-                                                            stars.cleanliness__avg +
-                                                            stars.conformity_to_photos__avg +
-                                                            stars.price_quality__avg +
-                                                            stars.location__avg +
-                                                            stars.quality_of_service__avg +
-                                                            stars.timeliness_of_check_in__avg
-                                                        ) / 6
-                                                    ).toFixed(1)
-                                                    : ""
-                                            }
+                                                            (
+                                                                stars.cleanliness__avg +
+                                                                stars.conformity_to_photos__avg +
+                                                                stars.price_quality__avg +
+                                                                stars.location__avg +
+                                                                stars.quality_of_service__avg +
+                                                                stars.timeliness_of_check_in__avg
+                                                            ) / 6
+                                                        ).toFixed(1)
+                                                        : ""
+                                                }
+                                            </span>
+                                            <span>
+                                                &nbsp;<span className="text-secondary">
+                                                    {props.reviews.length} отзыва
+                                                </span>
+                                            </span>
                                         </span>
                                         : <p>Пока что отзывов нету. Будьте первым! <br/>
-                                            <a href="/login">Авторизуйтесь</a> для того что бы оставить отзыв!
-
-                                            </p>
+                                            {sessionStorage.getItem("auth_token") ?
+                                                <SendReview/>
+                                                : <span>
+                                                    <a href="/login">Авторизуйтесь</a> для того что бы оставить отзыв!
+                                                </span>}
+                                        </p>
 
                                     }
 
                                 </span>
+
                                 {
                                     (props.reviews.length > 0) ?
                                         <span>
                                                 <TotalStars star={stars}/>
+                                            <div className="container">
+                                                {sessionStorage.getItem("auth_token") ?
+                                                    <SendReview/>
+                                                    : <div className="col-md">
+                                                        <a href="/login">Авторизуйтесь</a> для того что бы оставить отзыв!
+                                                    </div>}
+                                            </div>
                                                 <Reviews reviews={props.reviews}/>
                                             </span> : ""
                                 }
+
                             </div>
                         </div>
 
@@ -264,8 +298,8 @@ const Card = (props) => {
             </Routes>
         </div>
 
-)
-;
+    )
+        ;
 };
 
 export default Card;
