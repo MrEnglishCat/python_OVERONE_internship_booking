@@ -43,7 +43,7 @@ function LoginPage() {
         if (response.ok) {
             const token = await response.json();
             sessionStorage.setItem("auth_token", JSON.stringify(token));
-            navigate("/")
+            navigate(-1)
 
         } else {
             let error = await response.json();

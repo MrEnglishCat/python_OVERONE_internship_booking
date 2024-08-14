@@ -36,8 +36,7 @@ const NavigateHeader = (token) => {
         } else {
             console.log("NO TOKENS", sessionStorage);
 
-        }
-        ;
+        };
     }, []);
 
     async function reset_tokens(refresh_token) {

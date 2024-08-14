@@ -253,13 +253,27 @@ const Card = (props) => {
                                                 </span>
                                             </span>
                                         </span>
-                                        : <p>Пока что отзывов нету. Будьте первым! <br/>
-                                            {sessionStorage.getItem("auth_token") ?
-                                                <SendReview/>
-                                                : <span>
-                                                    <a href="/login">Авторизуйтесь</a> для того что бы оставить отзыв!
-                                                </span>}
-                                        </p>
+
+                                        :
+                                        <div className="container">
+                                            <div className="row align-items-center">
+                                                <div className="col align-text-center"></div>
+
+                                                <div className="col-lg-8 align-text-center">
+                                                    <div className="">Пока что отзывов нету. Будьте
+                                                        первым! <br/>
+                                                        {sessionStorage.getItem("auth_token") ?
+                                                            <SendReview/>
+                                                            : <p>
+                                                                <a href="/login">Авторизуйтесь</a> для того что бы
+                                                                оставить
+                                                                отзыв!
+                                                            </p>}
+                                                    </div>
+                                                </div>
+                                                <div className="col align-text-center"></div>
+                                            </div>
+                                        </div>
 
                                     }
 
@@ -273,7 +287,8 @@ const Card = (props) => {
                                                 {sessionStorage.getItem("auth_token") ?
                                                     <SendReview/>
                                                     : <div className="col-md">
-                                                        <a href="/login">Авторизуйтесь</a> для того что бы оставить отзыв!
+                                                        <a href="/login">Авторизуйтесь</a> для того что бы оставить
+                                                        отзыв!
                                                     </div>}
                                             </div>
                                                 <Reviews reviews={props.reviews}/>

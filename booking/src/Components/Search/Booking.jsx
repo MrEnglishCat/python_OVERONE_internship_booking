@@ -9,28 +9,120 @@ const Booking = (props) => {
     const [startD, setStartD] = useState();
     const [endD, setEndD] = useState();
     const [exchangeUSD, setExchangeUSD] = useState(0);
-    // const API_NBRB_ALL_CURRENCY = "https://api.nbrb.by/exrates/rates?periodicity=0"
+    const [username, setUsername] = useState("");
+    const [user_id, setUserId] = useState(null);
+    const [error, setError] = useState();
+    const [success, setSuccess] = useState(false);
+    const API_BOOKING = "http://127.0.0.1:8000/api/v1/booking/1"
     const API_NBRB_USD_CURRENCY = "https://api.nbrb.by/exrates/rates/431"
+    const API_REFRESH = "http://127.0.0.1:8000/api/v1/auth/token/refresh/";
+    const API_VERIFY = "http://127.0.0.1:8000/api/v1/auth/token/verify/";
+
     const HEADERS = {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7\n',
     };
     const startDate = document.getElementById('startDate')
     const endDate = document.getElementById('endDate')
+    const [days, setDays] = useState(1);
 
-    if (startDate && endDate) {
-        startDate.addEventListener('change', function (event) {
-            console.log('Произошло событие', event.type)
-            var today = new Date().toISOString().split('T')[0];
-            startDate.setAttribute('value', today)
-            setStartD(startDate.value)
-        })
-        endDate.addEventListener('change', function (event) {
+
+    useEffect(() => {
+
+        if (startDate && endDate) {
+            startDate.addEventListener('change', function (event) {
                 console.log('Произошло событие', event.type)
-                setEndD(endDate.value)
+                var today = new Date().toISOString().split('T')[0];
+                startDate.setAttribute('value', today)
+                setStartD(startDate.value.toDateString)
+            })
+            endDate.addEventListener('change', function (event) {
+                    console.log('Произошло событие', event.type)
+                    setEndD(endDate.value.toDateString)
+                }
+            );
+
+            console.log("days", days)
+
+        };
+
+        setDays(endDate - startDate)
+        console.log("days", days)
+    }, [startDate, endDate, days])
+
+
+    function parseJwt(token) {
+        if (!token) {
+            return "Нету токена";
+        }
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    };
+
+    async function reset_tokens(refresh_token) {
+        console.log("tokens_REFRESH", refresh_token)
+        let response = await fetch(
+            API_REFRESH,
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    refresh: refresh_token,
+                }),
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "*/*",
+                    // "Authorization": `Bearer ${JSON.stringify(tokens.access)}`
+                    // 'Cache-Control': 'no-cache',
+                },
             }
         );
 
+        if (response.ok) {
+            console.log("REFRESH", response.ok);
+            sessionStorage.removeItem("auth_token");
+            let tk = await response.json();
+            tk["refresh"] = refresh_token;
+            console.log("tk_REFRESH___", tk)
+            sessionStorage.setItem("auth_token", JSON.stringify(tk));
+        } else {
+            console.log("REFRESH", response);
+            sessionStorage.removeItem("auth_token");
+            console.log("Нужна повторная авторизация")
+            alert("Для запроса нужна повторная авторизация")
 
+        }
+    };
+
+    async function verify_token(ta, tr) {
+        console.log("tokens_VERIFY", ta)
+        let response = await fetch(
+            API_VERIFY,
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    token: ta,
+                }),
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "*/*",
+                    // "Authorization": `Bearer ${tokens.access}`
+                    // 'Cache-Control': 'no-cache',
+                },
+            }
+        );
+
+        if (response.ok) {
+            console.log('TOKENS IS VALID')
+            return true
+        } else {
+            console.log('TOKENS IS NOT VALID')
+            reset_tokens(tr)
+            console.log('TOKENS IS UPDATE')
+            return false
+        }
     }
 
     useEffect(() => {
@@ -48,6 +140,19 @@ const Booking = (props) => {
             };
 
             let result = ExchangeUsd()
+
+            if (sessionStorage.getItem("auth_token")) {
+                // let tokens = JSON.parse(sessionStorage.getItem("auth_token"));
+                let tokens = JSON.parse(sessionStorage.getItem("auth_token"));
+                let user = parseJwt(tokens.refresh).username;
+                let user_id = parseJwt(tokens.refresh).user_id;
+                setUsername(user);
+                setUserId(user_id)
+            } else {
+                console.log("NO TOKENS", sessionStorage);
+            }
+            ;
+
         },
         []
     )
@@ -61,6 +166,59 @@ const Booking = (props) => {
         // return`${month}/${day}/${year}`;
         // return `${year}-${month}-${day}`;
         return `${day}-${month}-${year}`;
+
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        setError(false)
+        setSuccess(false)
+        const arrive = await document.getElementById("startDate").value;
+        const departure = await document.getElementById("endDate").value;
+        if (sessionStorage.getItem("auth_token")) {
+            let tk = JSON.parse(sessionStorage.getItem("auth_token"));
+            console.log("tokens_REQUESTS", tk.refresh)
+
+            let isValid = await verify_token(tk.access, tk.refresh);
+
+            if (!isValid) {
+                const tk = JSON.parse(sessionStorage.getItem("auth_token"));
+                console.log("tk.access, tk.refresh", tk.access, tk.refresh);
+            }
+        } else {
+            var tk = {}
+        }
+
+
+        let response = await fetch(
+            API_BOOKING,
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    id: props.id,
+                    arrive: arrive,
+                    departure: departure,
+                    tenant: user_id
+                })
+                ,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "*/*",
+                    "Authorization": `Bearer ${tk.access}`
+
+                    // 'Cache-Control': 'no-cache',
+                },
+            }
+        );
+        if (response.ok) {
+            const data = await response.json();
+            console.log("data", data)
+            setSuccess(data)
+        } else {
+            let error = await response.json();
+            console.log("data", error.error);
+            setError(error)
+        }
 
     };
 
@@ -94,7 +252,7 @@ const Booking = (props) => {
                     </div>
                 </div>
                 <br/>
-                <form>
+                <form method="POST" onSubmit={handleSubmit}>
                     <div className="container shadow-lg  rounded-5">
                         <br/>
                         {/*<DatePicker/>*/}
@@ -127,6 +285,10 @@ const Booking = (props) => {
                         <br/>
                     </div>
                 </form>
+                <br/>
+                {error ?
+                    <div className="alert alert-danger">{error.error}{error.detail}</div> : success ?
+                        <div className="alert alert-success">{success.success}</div> : ""}
             </div>
         </div>
     );

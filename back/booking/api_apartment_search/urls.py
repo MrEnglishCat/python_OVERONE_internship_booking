@@ -21,6 +21,7 @@ router.register(r'get_count_of_views', views.GetCountOfReviewViewset, basename='
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('booking/<id>', views.BookingViewSet.as_view(), name='booking'),
     path('update_rating', views.UpdateRatingViewSet.as_view(), name="update_rating"),
     path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

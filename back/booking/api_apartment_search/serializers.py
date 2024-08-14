@@ -116,11 +116,10 @@ class ObjectRoomSerializer(serializers.ModelSerializer):
         )
 
 
-# class ReservationSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = models.ReservationModel
-#         fields = '__all__'
-#         read_only_fields = ('create_datetime',)
+class ReservationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ReservationModel
+        fields = '__all__'
 
 
 class AllStarsObjectRoomSerializer(serializers.ModelSerializer):
