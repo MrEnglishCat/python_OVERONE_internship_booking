@@ -28,7 +28,7 @@ const Search = () => {
         const headers = {
             'Accept': '*/*',
         };
-        responseData = await axios.get(API_URL_SEARCH + data_input_location.value, {headers});
+        responseData = await axios.get(API_URL_SEARCH + data_input_location.value + "&arrive=" + data_input_datetime_check_in.value + "&departure=" + data_input_datetime_departure.value , {headers});
         // ниже В responseData появился атрибут results т к в DRF добавил пагинацию
         setSearchData(await responseData.data.results);
         setStartSearch(true)

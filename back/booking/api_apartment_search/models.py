@@ -477,7 +477,7 @@ class ObjectRoomModel(models.Model):
     create_datetime = models.DateTimeField(auto_now_add=True)
     update_datetime = models.DateTimeField(auto_now=True, null=True, blank=True)
     is_published = models.BooleanField(default=False, )
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True)
+    owner = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True)
 
 
     class Meta:
@@ -490,15 +490,17 @@ class ObjectRoomModel(models.Model):
 
 
 class ReservationModel(models.Model):
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='reserved_user')
+    tenant = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='reserved_user', verbose_name='Жилец')
     room = models.ForeignKey(ObjectRoomModel, on_delete=models.DO_NOTHING, related_name='room', verbose_name='комната')
-    start_date = models.DateField('Дата, ОТ',)
-    end_date = models.DateField('Дата, ДО')
+    start_date = models.DateField('Заселение',)
+    end_date = models.DateField('Выселение')
+    is_confirmed = models.BooleanField(default=False)
 
     class Meta:
         db_table = '"api_reservation"'
         verbose_name = 'бронь'
         verbose_name_plural = 'брони'
+        unique_together = (('room', 'start_date', 'end_date'),)
 
 
 

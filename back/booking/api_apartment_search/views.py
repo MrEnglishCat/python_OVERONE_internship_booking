@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.db.models import Q, Count, ExpressionWrapper, F, FloatField, Avg
 
 from django.db.models.functions.comparison import NullIf
+from django.utils.dateparse import parse_date
 from rest_framework import viewsets, filters, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -23,11 +24,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import CustomUserSerializer
 from rest_framework_simplejwt.authentication import authentication
 
+
 # ===============
 
 
 # Create your views here.
- # class CitiesViewSet(viewsets.ModelViewSet):
+# class CitiesViewSet(viewsets.ModelViewSet):
 #     queryset = models.CityModel.objects.all()
 #     serializer_class = serializers.CitySerializer
 #     filter_backends = (filters.SearchFilter,)
@@ -99,12 +101,47 @@ class SearchMainPageViewSet(viewsets.ReadOnlyModelViewSet):
 
         elif not pk:
             search = self.request.query_params.get('search', None)
+            arrive = parse_date(a) if (a := self.request.query_params.get('arrive', None)) else None
+            departure = parse_date(a) if (a := self.request.query_params.get('departure', None)) else None
+            reservations = []
             if not search:
                 return models.ObjectRoomModel.objects.none()
+            if arrive and departure:
+                reservations = models.ReservationModel.objects.filter(
+                    Q(is_confirmed=True) &
+                    (
+                        (
+                            Q(start_date__range=(arrive, departure)) |
+                            Q(end_date__range=(arrive, departure))
+                        ) |
+                        (
+                            Q(start_date__lt=arrive) &
+                            Q(start_date__lt=departure) &
+                            Q(end_date__gt=arrive) &
+                            Q(end_date__gt=departure)
 
+                        ) |
+                        (
+                            Q(start_date__gt=arrive) &
+                            Q(start_date__lt=departure) &
+                            Q(end_date__gt=arrive) &
+                            Q(end_date__lt=departure)
+                        )
+                    )
+                    # Q(start_date__gt=arrive) & Q(end_date__gt=departure) & Q(start_date__lt=departure) & Q(end_date__gt=arrive) |
+                    # Q(start_date__lt=arrive) & Q(end_date__lt=departure) & Q(start_date__lt=departure) & Q(end_date__gt=arrive) |
+                    # Q(start_date__lt=arrive) & Q(end_date__gt=departure) & Q(start_date__lt=departure) & Q(end_date__gt=arrive) |
+                    # Q(start_date__gt=arrive) & Q(end_date__lt=departure) & Q(start_date__lt=departure) & Q(end_date__gt=arrive))
+                )
+            print(reservations)
+            room_id_list = [reservation.room_id for reservation in reservations]
+            print(room_id_list)
             result = models.ObjectRoomModel.objects.select_related('city', 'building_info', 'general_info').filter(
-                Q(title__icontains=search) | Q(city__name__icontains=search) | Q(
-                    city__country__name__icontains=search) & Q(is_published=True))  # .annotate(count=Count(
+                (Q(title__icontains=search) | Q(city__name__icontains=search) | Q(
+                    city__country__name__icontains=search) & Q(is_published=True))
+            ).exclude(pk__in=room_id_list)
+
+            # .annotate(count=Count(
             # 'title')).annotate(ratingsssss=ExpressionWrapper(F('rating_sum') / NullIf(F('votes'), 0),
             #
             #
@@ -117,9 +154,9 @@ class SearchMainPageViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ReviewsViewSet(viewsets.ModelViewSet):
-
     serializer_class = serializers.ReviewsSerializer
     permission_classes = (permissions.AllowAny,)
+
     # filter_backends = (filters.OrderingFilter,)
     # ordering_fields = '__all__'  # TODO нужны для возможности сортировки отзывов
 
@@ -136,15 +173,13 @@ class ReviewsViewSet(viewsets.ModelViewSet):
             else:
                 return models.ObjectRoomModel.objects.none()  # TODO проработать вариант выдачи своего сообщение вместо стандартного
 
-        else :
+        else:
             return models.ReviewsModel.objects.all()
-
 
     def retrieve(self, request, pk=None):  # TODO узнать для чего этот метод
         queryset = models.ReviewsModel.objects.filter(room_object_id=pk)
         serializer = serializers.ReviewsSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 
 class AllStarsObjectRoomViewSet(viewsets.ReadOnlyModelViewSet):
@@ -177,9 +212,9 @@ class AllStarsObjectRoomViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class GetCountOfReviewViewset(viewsets.ReadOnlyModelViewSet):
-
     serializer_class = serializers.ReviewsSerializer
     permission_classes = (permissions.AllowAny,)
+
     # filter_backends = (filters.OrderingFilter,)
     # ordering_fields = '__all__'  # TODO нужны для возможности сортировки отзывов
 
@@ -196,10 +231,9 @@ class GetCountOfReviewViewset(viewsets.ReadOnlyModelViewSet):
             else:
                 return models.ObjectRoomModel.objects.none()  # TODO проработать вариант выдачи своего сообщение вместо стандартного
 
-        else :
+        else:
             return models.ReviewsModel.objects.all()
-
 
     def retrieve(self, request, pk=None):  # TODO узнать для чего этот метод
         queryset = models.ReviewsModel.objects.filter(room_object_id=pk).count()
-        return Response({"reviews_count":queryset}, status=status.HTTP_200_OK)
+        return Response({"reviews_count": queryset}, status=status.HTTP_200_OK)
