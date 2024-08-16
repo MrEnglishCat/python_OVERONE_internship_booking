@@ -2,6 +2,7 @@ import React, {Component, useEffect, useState} from "react";
 import {Route, useParams, Link, Routes} from "react-router-dom";
 import DetailCard from "./DetailCard";
 import axios from "axios";
+import Images from "../General page/Images";
 
 const BriefItemCard = (props) => {
     const [objectRooms, setObjectRooms] = useState([]);
@@ -16,8 +17,11 @@ const BriefItemCard = (props) => {
 
     const API_ALL_STARTS_RATING = "http://127.0.0.1:8000/api/v1/get_object_rating/"
     const API_REVIEWS_COUNT = "http://127.0.0.1:8000/api/v1/get_count_of_views/"
+    const API_GET_IMAGES = "http://127.0.0.1:8000/api/v1/get_object_images/"
+
     const [stars, setStars] = useState({})
     const [countReviews, setCountReviews] = useState({});
+    const [images, setImages] = useState([]);
     const HEADERS = {
         'Accept': '*/*',
         // "Authorization": `Bearer ${sessionStorage.getItem("auth_token")}`
@@ -29,7 +33,7 @@ const BriefItemCard = (props) => {
             async function getStars() {
                 const response = await axios.get(API_ALL_STARTS_RATING + props.item.id + '/', {headers: HEADERS})
                     .then((response) => {
-                        setStars(response.data);
+                        setStars(response.data.images);
                     }).catch((error) => {
                         console.log(error);
                     });
@@ -44,94 +48,122 @@ const BriefItemCard = (props) => {
                     });
             };
 
+            async function getImages() {
+                await axios.get(API_GET_IMAGES + `${props.item.id}`).then((response) => {
+                    console.log("response.data.images", response.data.images);
+                    setImages(response.data.images);
+                }).catch((error) => {
+                    console.log(error);
+                });
+            };
 
+            getImages();
             getStars();
             getLenghtReviews();
         }, [props.item.id]
     );
 
 
-    console.log(props.item)
+    console.log('aaaa', props.item, images)
 
     return (
         <div key={props.item.id}>
             {/*<Link to={`/search/${props.item.id}/`} state={props}*/}
             {/*      className="link-offset-2 link-underline link-underline-opacity-0">*/}
-            <div className="card shadow-lg rounded-lg rounded-5"
-                 style={{maxWidth: 1100, height: "auto", margin: 'auto'}}>
-                <div class="row">
-                    <div className="col-md-3 col-12">
-                        <div id={`selector-${props.item.id}`} className="carousel slide carousel-fade"
-                             data-bs-ride="carousel">
-                            <div className="carousel-inner">
-                                <div className="carousel-item active">
-                                    <img src="image/user_objects/1/1.webp" className="d-block img-fluid rounded-5"
-                                         alt="..."/>
+            <div className="container ">
+                <div className="card shadow-lg rounded-lg rounded-5"
+                     style={{maxWidth: 1100, height: "auto", margin: 'auto'}}>
+                    <div className="row">
+                        <div className="col-lg-3 col-12 ">
+                                <div id={`selector-${props.item.id}`} className=" shadow-lg   rounded-5 carousel slide"
+                                     data-bs-ride="carousel">
+                                    <div className="carousel-indicators">
+                                        <button type="button" data-bs-target={`#selector-${props.item.id}`}
+                                                data-bs-slide-to="0"
+                                                className="active" aria-current="true" aria-label="Slide 1"></button>
+                                        <button type="button" data-bs-target={`#selector-${props.item.id}`}
+                                                data-bs-slide-to="1"
+                                                aria-label="Slide 2"></button>
+                                        <button type="button" data-bs-target={`#selector-${props.item.id}`}
+                                                data-bs-slide-to="2"
+                                                aria-label="Slide 3"></button>
+                                    </div>
+                                    <div className="carousel-inner   rounded-5">
+                                        {/*{*/}
+                                        {/*    props.images ? props.images.map((image, i) => {})*/}
+                                        {/*}*/}
+                                        <div className="carousel-item active">
+                                            <img src="/image/user_objects/1/6.webp"
+                                                 className="d-block   rounded-5"
+                                                 alt="..."
+                                                 height="200"  style={{display: "flex", objectFit: "cover"}}/>
+                                        </div>
+                                        <div className="carousel-item">
+                                            <img src="/image/user_objects/1/5.webp" className="d-block w-100  rounded-5"
+                                                 alt="..."
+                                                 height="200" style={{display: "flex", objectFit: "cover"}}/>
+                                        </div>
+                                        <div className="carousel-item">
+                                            <img src="/image/user_objects/1/4.webp"
+                                                 className="d-block w-100   rounded-5"
+                                                 alt="..."
+                                                 height="200" style={{display: "flex", objectFit: "cover"}}/>
+                                        </div>
+                                    </div>
+                                    <button className="carousel-control-prev" type="button"
+                                            data-bs-target={`#selector-${props.item.id}`}
+                                            data-bs-slide="prev">
+                                        <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span className="visually-hidden">Previous</span>
+                                    </button>
+                                    <button className="carousel-control-next" type="button"
+                                            data-bs-target={`#selector-${props.item.id}`}
+                                            data-bs-slide="next">
+                                        <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span className="visually-hidden">Next</span>
+                                    </button>
                                 </div>
-                                <div className="carousel-item">
-                                    <img src="image/user_objects/1/2.webp" className="d-block img-fluid rounded-5"
-                                         alt="..."/>
-                                </div>
-                                <div className="carousel-item">
-                                    <img src="image/user_objects/1/3.webp" className="d-block img-fluid rounded-5"
-                                         alt="..."/>
-                                </div>
-                            </div>
-                            <button className="carousel-control-prev" type="button"
-                                    data-bs-target={`#selector-${props.item.id}`} data-bs-slide="prev">
-                                <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span className="visually-hidden">Previous</span>
-                            </button>
-                            <button className="carousel-control-next" type="button"
-                                    data-bs-target={`#selector-${props.item.id}`} data-bs-slide="next">
-                                <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span className="visually-hidden">Next</span>
-                            </button>
+
+
                         </div>
-
-
-                        {/*<img src="image/user_objects/1/1.webp" className="img-fluid rounded-5"*/}
-                        {/*     alt="фото квартиры"*/}
-                        {/*     width="100%" height="auto"/>*/}
-                    </div>
-                    <div className="col-md-9">
-                        <Link to={`/search/${props.item.id}/`} state={props}
-                              className="link-dark link-offset-2 link-underline link-underline-opacity-0">
-                            <div className="card-body">
-                                <div className=" card-text">
-                                    <div class="container-fluid">
-                                        <div className="row ">
-                                            <div className="col-lg-9 text-start border-right">
-                                                <div className="row-2">
-                                                    <div className="col">
-                                                        <p className="fs-6">{props.item.general_info ? `${props.item.general_info.rooms_count}-комнатная квартира` : ""}</p>
-                                                        <h5>{props.item.title}</h5>
+                        <div className="col-md-9">
+                            <Link to={`/search/${props.item.id}/`} state={props}
+                                  className="link-dark link-offset-2 link-underline link-underline-opacity-0">
+                                <div className="card-body">
+                                    <div className=" card-text">
+                                        <div class="container-fluid">
+                                            <div className="row ">
+                                                <div className="col-lg-9 text-start border-right">
+                                                    <div className="row-2">
+                                                        <div className="col">
+                                                            <p className="fs-6">{props.item.general_info ? `${props.item.general_info.rooms_count}-комнатная квартира` : ""}</p>
+                                                            <h5>{props.item.title}</h5>
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <div className="row ">
-                                                    <div className="col-7 text-black-50">
+                                                    <div className="row ">
+                                                        <div className="col-7 text-black-50">
                                                         <span className="fs-6 mx-0">{props.item.general_info ?
                                                             <span>{props.item.general_info.room_square}м<sup>2</sup> </span> : ""}
                                                         </span>
-                                                        <span
-                                                            className="fs-6 mx-2">{props.item.general_info ? `гостей: ${props.item.general_info.guests_count} ` : ""}</span>
+                                                            <span
+                                                                className="fs-6 mx-2">{props.item.general_info ? `гостей: ${props.item.general_info.guests_count} ` : ""}</span>
 
-                                                        <span
-                                                            className="fs-6 mx-2">{props.item.general_info ? `спальных мест: ${props.item.general_info.count_sleeping_places} ` : ""}</span>
+                                                            <span
+                                                                className="fs-6 mx-2">{props.item.general_info ? `спальных мест: ${props.item.general_info.count_sleeping_places} ` : ""}</span>
+                                                        </div>
+                                                        {/*<div className="col">*/}
+                                                        {/*    <p className="fs-6">{props.item.general_info ? `гостей: ${props.item.general_info.guests_count}` : ""}</p>*/}
+                                                        {/*</div>*/}
+                                                        {/*<div className="col-4">*/}
+                                                        {/*    <p className="fs-6">{props.item.general_info ? `спальных мест: ${props.item.general_info.count_sleeping_places}` : ""}</p>*/}
+                                                        {/*</div>*/}
+                                                        {/*<div className="col">*/}
+                                                        {/*</div>*/}
+
                                                     </div>
-                                                    {/*<div className="col">*/}
-                                                    {/*    <p className="fs-6">{props.item.general_info ? `гостей: ${props.item.general_info.guests_count}` : ""}</p>*/}
-                                                    {/*</div>*/}
-                                                    {/*<div className="col-4">*/}
-                                                    {/*    <p className="fs-6">{props.item.general_info ? `спальных мест: ${props.item.general_info.count_sleeping_places}` : ""}</p>*/}
-                                                    {/*</div>*/}
-                                                    {/*<div className="col">*/}
-                                                    {/*</div>*/}
-
-                                                </div>
-                                                <div className="row-sm-4 ">
-                                                    <div className="col">
+                                                    <div className="row-sm-4 ">
+                                                        <div className="col">
                                                         <span className="fs-6">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="16"
                                                                  height="16"
@@ -166,23 +198,24 @@ const BriefItemCard = (props) => {
                                                                  </span>
                                                             </span>
 
+                                                        </div>
                                                     </div>
+
                                                 </div>
+                                                <div className="col-lg-3 text-end">
 
-                                            </div>
-                                            <div className="col-lg-3 text-end">
-
-                                                <p className="fs-6">{props.item.payment_day} BYN в сутки</p>
-                                                <p></p>
-                                                <p></p>
-                                                <p className="fs-6 ">Для будущих доп сведений связанных
-                                                    с оплатой</p>
+                                                    <p className="fs-6">{props.item.payment_day} BYN в сутки</p>
+                                                    <p></p>
+                                                    <p></p>
+                                                    <p className="fs-6 ">Для будущих доп сведений связанных
+                                                        с оплатой</p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </Link>
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -190,7 +223,7 @@ const BriefItemCard = (props) => {
             <Routes>
                 <Route
                     path="/search/:id"
-                    render={(props) => <DetailCard props/>}
+                    render={(props, images) => <DetailCard images={images}/>}
                 />
             </Routes>
         </div>

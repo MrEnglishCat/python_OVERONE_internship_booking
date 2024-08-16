@@ -54,9 +54,10 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ImageSerializer(serializers.ModelSerializer):
+class ImagesSerializer(serializers.ModelSerializer):
+    # lookup_field = 'room_object_id'
     class Meta:
-        model = models.ImageUrlsModel
+        model = models.ImagesModel
         fields = '__all__'
 
 
@@ -105,9 +106,10 @@ class ObjectRoomSerializer(serializers.ModelSerializer):
     city = CitySerializer(read_only=True)
     building_info = BuildingTypeSerializer(read_only=True)
     general_info = GeneralInformationSerializer(read_only=True)
-    images_path = ImageSerializer(read_only=True, many=True)
+    # images_path = ImagesSerializer(read_only=True, many=True)
     placing_rules = PlasingRulesSerializer(read_only=True)
     address = AddressSerializer(read_only=True)
+    update_datetime = serializers.DateTimeField(format="%d-%m-%Y %H:%M")
     class Meta:
         model = models.ObjectRoomModel
 

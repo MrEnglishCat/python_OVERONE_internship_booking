@@ -44,7 +44,7 @@ const DetailCard = (props) => {
     return (
         <div>
             <NavigateHeader/>
-             <Card item={ObjectRoom} reviews={reviews}/>
+             <Card item={ObjectRoom} reviews={reviews} images={props.images}/>
             <Footer/>
         </div>
 

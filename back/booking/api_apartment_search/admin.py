@@ -40,7 +40,8 @@ class InlineCityAdmin(admin.TabularInline):
     # list_max_show_all = 200
     extra = 1
     per_page = 20
-
+    can_delete = True
+    classes = ['collapse']
     def get_formset(self, request, obj=None, **kwargs):
         formset_class = super(InlineCityAdmin, self).get_formset(
             request, obj, **kwargs
@@ -110,7 +111,8 @@ class InlineAddressAdmin(admin.TabularInline):
     list_display = ('id', 'street_type', 'street_name', 'building_number', 'corps', 'location',)
     list_select_related = True
     extra = 1
-
+    can_delete = True
+    classes = ['collapse']
 
 @admin.register(models.StreetTypeModel)
 class StreetTypeAdmin(admin.ModelAdmin):
@@ -152,7 +154,8 @@ class InlineReserveAdmin(admin.TabularInline):
     list_select_related = True
     model = models.ReservationModel
     extra = 1
-
+    can_delete = True
+    classes = ['collapse']
 
 # class InlineRatingAdmin(admin.TabularInline):
 #     list_select_related = True
@@ -164,12 +167,23 @@ class InlineReviewsAdmin(admin.TabularInline):
     list_select_related = True
     model = models.ReviewsModel
     extra = 0
+    can_delete = True
     # inlines = (InlineRatingAdmin,)
-
+    classes = ['collapse']
 
 @admin.register(models.RatingModel)
 class RatingAdmin(admin.ModelAdmin):
     list_select_related = True
+
+
+class InlineImageAdmin(admin.TabularInline):
+    model = models.ImagesModel
+    extra = 0
+    can_delete = True
+    list_select_related = True
+    classes = ['collapse']
+
+
 
 
 @admin.register(models.ObjectRoomModel)
@@ -181,5 +195,5 @@ class ObjectRoomModel(admin.ModelAdmin):
     # autocomplete_fields = ('city', 'building_info',)  # изначальная строка
     autocomplete_fields = ('building_info', "city")
     raw_id_fields = ('city', 'building_info')
-    inlines = (InlineReserveAdmin, InlineReviewsAdmin)
+    inlines = (InlineImageAdmin, InlineReserveAdmin, InlineReviewsAdmin)
     # list_select_related = True

@@ -6,9 +6,9 @@ import NavigateHeader from "../General page/NavigateHeader";
 import Booking from "./Booking";
 import Reviews from "./reviews/Reviews";
 import TotalStars from "./reviews/TotalStars";
-import DetailCard from "./DetailCard";
 import LoginPage from "../Authorization/LoginPage";
 import SendReview from "./reviews/SendReview";
+import Images from "../General page/Images"
 
 const Card = (props) => {
 
@@ -33,22 +33,22 @@ const Card = (props) => {
         // "Authorization": `Bearer ${sessionStorage.getItem("auth_token")}`
     };
 
+    async function getStars() {
+        const response = await axios.get(API_ALL_STARTS_RATING + props.item.id + '/', {headers: HEADERS})
+            .then((response) => {
+                setStars(response.data);
+            }).catch((error) => {
+                console.log(error);
+            });
+    };
+
 
     useEffect(
         () => {
-            async function getStars() {
-                const response = await axios.get(API_ALL_STARTS_RATING + props.item.id + '/', {headers: HEADERS})
-                    .then((response) => {
-                        setStars(response.data);
-                    }).catch((error) => {
-                        console.log(error);
-                    });
-            };
             getStars();
-
             let dt = new Date();
             console.log(dt);
-// props.item.review_updated
+
         }, [props.item.id]
     );
 
@@ -96,34 +96,48 @@ const Card = (props) => {
                               &nbsp;{props.item.address ? `${props.item.city.name}, ${props.item.address.street_type} ${props.item.address.street_name} ${props.item.address.building_number} ${props.item.address.corps ? props.item.address.corps : ""}` : ""}
                             </span>
                         </p>
-
-                        <div className="container ">
-                            <div id="carouselExampleFade" className="carousel slide carousel-fade"
-                                 data-bs-ride="carousel ">
-                                <div className="carousel-inner ">  {/*, objectFit: "cover"*/}
+                        <div className="container">
+                            <div id="carouselExampleIndicators" className=" shadow-lg   rounded-5 carousel slide" data-bs-ride="carousel">
+                                <div className="carousel-indicators">
+                                    <button type="button" data-bs-target="#carouselExampleIndicators"
+                                            data-bs-slide-to="0"
+                                            className="active" aria-current="true" aria-label="Slide 1"></button>
+                                    <button type="button" data-bs-target="#carouselExampleIndicators"
+                                            data-bs-slide-to="1"
+                                            aria-label="Slide 2"></button>
+                                    <button type="button" data-bs-target="#carouselExampleIndicators"
+                                            data-bs-slide-to="2"
+                                            aria-label="Slide 3"></button>
+                                </div>
+                                <div className="carousel-inner   rounded-5">
+                                    {/*{*/}
+                                    {/*    props.images ? props.images.map((image, i) => {})*/}
+                                    {/*}*/}
                                     <div className="carousel-item active">
-                                        <img src="/image/user_objects/2/1.webp"
-                                             className="d-grid img-fluid rounded-5"
-                                             alt="..." style={{display: "flex", objectFit: "cover",}}/>
+                                        <img src="/image/user_objects/1/6.webp" className="d-block w-100   rounded-5"
+                                             alt="..." width="1000"
+                                             height="600" style={{display: "flex", objectFit: "cover"}}/>
                                     </div>
                                     <div className="carousel-item">
-                                        <img src="/image/user_objects/2/2.webp"
-                                             className="d-grid img-fluid rounded-5"
-                                             alt="..." style={{display: "flex", objectFit: "cover",}}/>
+                                        <img src="/image/user_objects/1/5.webp" className="d-block w-100  rounded-5"
+                                             alt="..." width="1000"
+                                             height="600" style={{display: "flex", objectFit: "cover"}}/>
                                     </div>
                                     <div className="carousel-item">
-                                        <img src="/image/user_objects/2/3.webp"
-                                             className="d-grid img-fluid rounded-5"
-                                             alt="..." style={{display: "flex", objectFit: "cover",}}/>
+                                        <img src="/image/user_objects/1/4.webp" className="d-block w-100   rounded-5"
+                                             alt="..." width="1000"
+                                             height="600" style={{display: "flex", objectFit: "cover"}}/>
                                     </div>
                                 </div>
                                 <button className="carousel-control-prev" type="button"
-                                        data-bs-target="#carouselExampleFade" data-bs-slide="prev">
+                                        data-bs-target="#carouselExampleIndicators"
+                                        data-bs-slide="prev">
                                     <span className="carousel-control-prev-icon" aria-hidden="true"></span>
                                     <span className="visually-hidden">Previous</span>
                                 </button>
                                 <button className="carousel-control-next" type="button"
-                                        data-bs-target="#carouselExampleFade" data-bs-slide="next">
+                                        data-bs-target="#carouselExampleIndicators"
+                                        data-bs-slide="next">
                                     <span className="carousel-control-next-icon" aria-hidden="true"></span>
                                     <span className="visually-hidden">Next</span>
                                 </button>

@@ -1,18 +1,14 @@
 import time
 from datetime import datetime, timedelta
+
+import uuid
 from django.db import models
 from django.contrib.auth.models import User
-# from . import users_models
-# from . import api_auth
 from django.core.validators import MaxValueValidator, MinValueValidator
-
-
-
+from django.contrib.auth.models import User
 
 from rest_framework.views import APIView, status, Response
 from rest_framework import permissions
-from django.contrib.auth.models import User
-
 
 
 # Create your models here.
@@ -365,30 +361,30 @@ class AmenitiesModel(models.Model):  # Amenities - удобства
         return self.amenities_name
 
 
-class ImageUrlsModel(models.Model):
-    # image_path_url = models.ImageField(upload_to='images/')
-    image_path_url = models.CharField(max_length=100, unique=True)
-
-    # object_room = models.ForeignKey('ObjectRoomModel', on_delete=models.DO_NOTHING)
-
-    class Meta:
-        db_table = '"api_imageurls"'
-        verbose_name_plural = 'Изображения'
-        verbose_name = 'Изображение'
-
-    def __str__(self):
-        return self.image_path_url
-
-
-class ImageConnectorModel(models.Model):
-    image_urls = models.ForeignKey(ImageUrlsModel, on_delete=models.DO_NOTHING)
-    object_room = models.ForeignKey('ObjectRoomModel', on_delete=models.DO_NOTHING)
-
-    class Meta:
-        db_table = '"api_imageconnectors"'
-
-
+# class ImageUrlsModel(models.Model):
+#     # image_path_url = models.ImageField(upload_to='images/')
+#     image_path_url = models.CharField(max_length=100, unique=True)
 #
+#     # object_room = models.ForeignKey('ObjectRoomModel', on_delete=models.DO_NOTHING)
+#
+#     class Meta:
+#         db_table = '"api_imageurls"'
+#         verbose_name_plural = 'Изображения'
+#         verbose_name = 'Изображение'
+#
+#     def __str__(self):
+#         return self.image_path_url
+#
+#
+# class ImageConnectorModel(models.Model):
+#     image_urls = models.ForeignKey(ImageUrlsModel, on_delete=models.DO_NOTHING)
+#     object_room = models.ForeignKey('ObjectRoomModel', on_delete=models.DO_NOTHING)
+#
+#     class Meta:
+#         db_table = '"api_imageconnectors"'
+#
+#
+# #
 #
 class PlacingRulesModel(models.Model):
     # TODO всем полям ниже нужны значения по умолчанию в select
@@ -436,42 +432,33 @@ class ObjectRoomModel(models.Model):
         (WIRE_TRANSFER, 'Перевод'),
     ]
 
-    title = models.CharField(max_length=100)
-    # images_path = models.ForeignKey(ImageConnectorModel,
-    #                                 on_delete=models.DO_NOTHING, null=True,
-    #                                 blank=True)  # хранение адресов на изображения. Разделитель: ","
+    title = models.CharField(max_length=100, verbose_name="Название объекта")
     #     # TODO рассмотреть возможность сделать зависимость параметров от типа строения
     #     # TODO СУПЕРХОЗЯИН ГОСТИ РЕКОМЕНДУЮТ 9.9 (12 отзывов) - добавить рейтинг, отзывы. Отобразить количество отзывов
-    building_description = models.TextField()
-    #
-    #     placing_rules = models.ForeignKey(PlacingRulesModel, on_delete=models.DO_NOTHING)
-    #     arrival_departure = models.ForeignKey(ArrivalsDepartueModel, on_delete=models.DO_NOTHING)
-    prepayment = models.FloatField(default=0.0)  # persent default 20%   default_currency = BYN
-    payment_day = models.FloatField(default=0.0)
+    building_description = models.TextField(verbose_name="Описание объекта")
+    prepayment = models.FloatField(default=0.0, verbose_name="Предоплата")  # persent default 20%   default_currency = BYN
+    payment_day = models.FloatField(default=0.0, verbose_name="Оплата за сутки")
     payment_method = models.CharField(
         'payment method',
         choices=PAYMENT_METHOD_CHOICES,
-        default=CASH
+        default=CASH,
+        # verbose_name="Метод оплаты"
     )
-    address = models.ForeignKey(AddressModel, on_delete=models.DO_NOTHING, null=True, blank=True)
-    arrival_time = models.TimeField(default=datetime.now().strftime('%H:%M'))
-    departure_time = models.TimeField(default=(datetime.now() + timedelta(hours=1)).strftime('%H:%M'))
-    minimum_length_of_stay = models.PositiveIntegerField(default=1)  # минимальный срок проживания
-
-    placing_rules = models.ForeignKey(PlacingRulesModel, on_delete=models.CASCADE, null=True, blank=True)
-    price = models.FloatField(default=0.0)
+    address = models.ForeignKey(AddressModel, on_delete=models.DO_NOTHING, null=True, blank=True, verbose_name="Адрес")
+    arrival_time = models.TimeField(default=datetime.now().strftime('%H:%M'), verbose_name="Заезд")
+    departure_time = models.TimeField(default=(datetime.now() + timedelta(hours=1)).strftime('%H:%M'), verbose_name="Отъезд")
+    minimum_length_of_stay = models.PositiveIntegerField(default=1, verbose_name="Минимальное количество дней заселения")  # минимальный срок проживания
+    placing_rules = models.ForeignKey(PlacingRulesModel, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Правила размещения")
+    # price = models.FloatField(default=0.0)
     #     sales = models.ForeignKey(SalesModel, on_delete=models.DO_NOTHING)
     #
-
-    general_info = models.ForeignKey(GeneralInformationModel, on_delete=models.CASCADE, null=True, blank=True)
-    building_info = models.ForeignKey(BuildingTypeModel, on_delete=models.DO_NOTHING)
-
-    city = models.ForeignKey(CityModel, on_delete=models.DO_NOTHING)
-
-    create_datetime = models.DateTimeField(auto_now_add=True)
-    update_datetime = models.DateTimeField(auto_now=True, null=True, blank=True)
-    is_published = models.BooleanField(default=False, )
-    owner = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True)
+    general_info = models.ForeignKey(GeneralInformationModel, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Общая информация")
+    building_info = models.ForeignKey(BuildingTypeModel, on_delete=models.DO_NOTHING, verbose_name="Информация о строении")
+    city = models.ForeignKey(CityModel, on_delete=models.DO_NOTHING, verbose_name="Город")
+    create_datetime = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    update_datetime = models.DateTimeField(auto_now=True, null=True, blank=True, verbose_name="Дата обновления")
+    is_published = models.BooleanField(default=False, verbose_name="Опубликовано ?")
+    owner = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True, verbose_name="Собственник")
 
 
     class Meta:
@@ -497,6 +484,8 @@ class ReservationModel(models.Model):
         verbose_name_plural = 'брони'
         unique_together = (('room', 'start_date', 'end_date'),)
 
+    def __str__(self):
+        return f'Пользователь {self.tenant}. Бронь с {self.start_date} по {self.end_date}'
 
 
 class RatingModel(models.Model):
@@ -533,3 +522,19 @@ class ReviewsModel(models.Model):
         verbose_name_plural = "Отзывы"
         unique_together = (( 'room_object', 'user'),)
 
+#
+class ImagesModel(models.Model):
+    image_path = models.CharField(verbose_name="Путь до изображения", max_length=2000 )
+    room_object = models.ForeignKey(ObjectRoomModel, on_delete=models.DO_NOTHING, verbose_name="Объект")
+
+
+    class Meta:
+        db_table = '"api_images"'
+        verbose_name = "Изображение"
+        verbose_name_plural = "Изображения"
+        # ordering = ('image_path',)
+        # unique_together = ('image_path',)
+        unique_together = (('room_object','image_path'),)
+
+    def __str__(self):
+        return f"Название файла: {self.image_path.split('/')[-1]}"

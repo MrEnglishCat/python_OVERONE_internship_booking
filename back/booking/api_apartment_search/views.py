@@ -139,13 +139,6 @@ class SearchMainPageViewSet(viewsets.ReadOnlyModelViewSet):
                 (Q(title__icontains=search) | Q(city__name__icontains=search) | Q(
                     city__country__name__icontains=search) & Q(is_published=True))
             ).exclude(pk__in=room_id_list)
-
-            # .annotate(count=Count(
-            # 'title')).annotate(ratingsssss=ExpressionWrapper(F('rating_sum') / NullIf(F('votes'), 0),
-            #
-            #
-            #                                             output_field=FloatField()))  # | ( Q(country__name=search) | Q(region__name=search) = добавить поиск по курорту, адресу
-
             return result
         else:
             # return Response({'error': f'pk is not valid value. Need integer, but your value is {pk}'}, status=status.HTTP_400_BAD_REQUEST)
@@ -167,7 +160,6 @@ class ReviewsViewSet(viewsets.ModelViewSet):
             result = models.ReviewsModel.objects.filter(room_object_id=int(object_id))
 
             if result:
-                print(object_id, result)
                 return result
             else:
                 return models.ObjectRoomModel.objects.none()  # TODO проработать вариант выдачи своего сообщение вместо стандартного
@@ -239,7 +231,6 @@ class GetCountOfReviewViewset(viewsets.ReadOnlyModelViewSet):
 
 
 class BookingViewSet(APIView):
-    # permission_classes = (permissions.IsAuthenticated,)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = serializers.ReservationSerializer
 
@@ -249,7 +240,6 @@ class BookingViewSet(APIView):
         departure = parse_date(a) if (a := self.kwargs.get('departure', None)) else None
         if object_id:
             if arrive and departure:
-                print(object_id, arrive, departure)
                 return Response({'success':'забронированы даты...'}, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "Please enter valid dates"}, status=status.HTTP_400_BAD_REQUEST)
@@ -336,3 +326,38 @@ class BookingViewSet(APIView):
                 return Response({"error": "Пожалуйста укажите валидные данные формы!"}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({"error": "Пожалуйста укажите валидные данные формы!"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# class ImagesViewSet(viewsets.ModelViewSet):
+#
+#     permission_classes = (permissions.AllowAny,)
+#     serializer_class = serializers.ImagesSerializer
+#     queryset = models.ImagesModel.objects.all()
+#     lookup_field = 'room_object_id'
+#
+#     def retrieve(self, request, *args, **kwargs):
+#         object_id = self.kwargs.get('room_object_id', None)
+#         if object_id:
+#             queryset = models.ImagesModel.objects.filter(room_object_id=object_id)
+#             serializer = serializers.ImagesSerializer(queryset, many=True)
+#
+#             return Response({"images": serializer.data}, status=status.HTTP_200_OK)
+#             # return Response(queryset, status=status.HTTP_200_OK)
+#         else:
+#             return Response({"error":"Не указан id объъекта"}, status=status.HTTP_400_BAD_REQUEST)
+#         instance = self.get_object()
+#         serializer = self.get_serializer(instance)
+#         return Response(serializer.data)
+
+class ImagesViewSet(APIView):
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = serializers.ImagesSerializer
+
+    def get(self, *args, **kwargs):
+        object_id = self.kwargs.get('room_object_id', None)
+        if object_id and object_id.isdigit():
+            queryset = models.ImagesModel.objects.filter(room_object_id=int(object_id))
+            serializer = serializers.ImagesSerializer(queryset, many=True)
+            return Response({"images": serializer.data}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'не предоставлен или указан неверный ID объекта'}, status=status.HTTP_400_BAD_REQUEST)
