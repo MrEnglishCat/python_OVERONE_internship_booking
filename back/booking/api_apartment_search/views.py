@@ -113,28 +113,26 @@ class SearchMainPageViewSet(viewsets.ReadOnlyModelViewSet):
                 reservations = models.ReservationModel.objects.filter(
                     Q(is_confirmed=True) &
                     (
-                        (
-                            Q(start_date__range=(arrive, departure)) |
-                            Q(end_date__range=(arrive, departure))
-                        ) |
-                        (
-                            Q(start_date__lt=arrive) &
-                            Q(start_date__lt=departure) &
-                            Q(end_date__gt=arrive) &
-                            Q(end_date__gt=departure)
+                            (
+                                    Q(start_date__range=(arrive, departure)) |
+                                    Q(end_date__range=(arrive, departure))
+                            ) |
+                            (
+                                    Q(start_date__lte=arrive) &
+                                    Q(start_date__lt=departure) &
+                                    Q(end_date__gt=arrive) &
+                                    Q(end_date__gte=departure)
 
-                        ) |
-                        (
-                            Q(start_date__gt=arrive) &
-                            Q(start_date__lt=departure) &
-                            Q(end_date__gt=arrive) &
-                            Q(end_date__lt=departure)
-                        )
+                            ) |
+                            (
+                                    Q(start_date__gt=arrive) &
+                                    Q(start_date__lte=departure) &
+                                    Q(end_date__gt=arrive) &
+                                    Q(end_date__lte=departure)
+                            )
                     )
                 )
-            print(reservations)
             room_id_list = [reservation.room_id for reservation in reservations]
-            print(room_id_list)
             result = models.ObjectRoomModel.objects.select_related('city', 'building_info', 'general_info').filter(
                 (Q(title__icontains=search) | Q(city__name__icontains=search) | Q(
                     city__country__name__icontains=search) & Q(is_published=True))
@@ -284,7 +282,6 @@ class BookingViewSet(APIView):
         departure = parse_date(a) if (a := request.data.get('departure', None)) else a
         tenant = str(a) if (a:=request.data.get('tenant', None)) else a
         date_now = datetime.now().date()
-        print(date_now, arrive, departure)
         if object_id:
             if arrive and departure and tenant:
                 if arrive > departure:
@@ -305,8 +302,9 @@ class BookingViewSet(APIView):
                         {
                             'error': f'Дата заезда {arrive} и отъезда {departure} совпадают! Отличие должно быть минимум на 1 день!'},
                         status=status.HTTP_400_BAD_REQUEST)
+
+
                 serializer = serializers.ReservationSerializer(data={'tenant':tenant, 'room':object_id, 'start_date': arrive, 'end_date': departure, 'is_confirmed': True})
-                # serializer = serializers.ReservationSerializer(data=kwargs.setdefault('is_confirmed', True))
                 if serializer.is_valid():
 
                     reservations = models.ReservationModel.objects.filter(
@@ -317,29 +315,29 @@ class BookingViewSet(APIView):
                                         Q(end_date__range=(arrive, departure))
                                 ) |
                                 (
-                                        Q(start_date__lt=arrive) &
+                                        Q(start_date__lte=arrive) &
                                         Q(start_date__lt=departure) &
                                         Q(end_date__gt=arrive) &
-                                        Q(end_date__gt=departure)
+                                        Q(end_date__gte=departure)
 
                                 ) |
                                 (
                                         Q(start_date__gt=arrive) &
-                                        Q(start_date__lt=departure) &
+                                        Q(start_date__lte=departure) &
                                         Q(end_date__gt=arrive) &
-                                        Q(end_date__lt=departure)
+                                        Q(end_date__lte=departure)
                                 )
                         )
                     )
 
-                    room_id_list = [reservation.room_id for reservation in reservations]
-                    if serializer.validated_data.get("room") in room_id_list:
-                        return Response({'error':f'Указанные даты заняты!'}, status=status.HTTP_200_OK)
+                    room_id_list = set((reservation.room_id for reservation in reservations))
+                    if serializer.validated_data.get("room").id in room_id_list:
+                        return Response({'error':f'Указанные даты заняты!'}, status=status.HTTP_400_BAD_REQUEST)
                     serializer.save()
                     return Response({'success':'Дата забронирована!'}, status=status.HTTP_200_OK)
                 else:
                     # print(serializer.errors)
-                    return Response({'error':f'Указанные даты заняты!'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'error':f'SERIALIZER: Указанные даты заняты!'}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response({"error": "Пожалуйста укажите валидные данные формы!"}, status=status.HTTP_400_BAD_REQUEST)
         else:

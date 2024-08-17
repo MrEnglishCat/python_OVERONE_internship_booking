@@ -242,15 +242,18 @@ const Booking = (props) => {
 
 
     useEffect(() => {
-        console.log('error_useEffect', error)
-        console.log('success_useEffect', success)
-        setError(error)
+        if (success) {
         setSuccess(success)
+        } else {
+        setError(error)
+        }
 
     }, [error, success])
 
     const handleFavorite = async (event) => {
-
+        event.preventDefault();
+        setError(false)
+        setSuccess(false)
 
         if (sessionStorage.getItem("auth_token")) {
             // let tokens = JSON.parse(sessionStorage.getItem("auth_token"));
@@ -361,11 +364,12 @@ const Booking = (props) => {
                     </div>
                 </form>
                 <br/>
-                {
-                    error ?
-                        <Alert severity="error">{error.error}{error.detail}</Alert> : success ?
-                            <Alert severity="success">{success.success}</Alert> : ""
-                }
+                <Error error={error} success={success}/>
+                {/*{*/}
+                {/*    error ?*/}
+                {/*        <Alert severity="error">{error.error}{error.detail}</Alert> : success ?*/}
+                {/*            <Alert severity="success">{success.success}</Alert> : ""*/}
+                {/*}*/}
             </div>
         </div>
     );
