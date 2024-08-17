@@ -242,9 +242,9 @@ class BookingViewSet(APIView):
             if arrive and departure:
                 return Response({'success':'забронированы даты...'}, status=status.HTTP_200_OK)
             else:
-                return Response({"error": "Please enter valid dates"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Пожалуйста, введите валидные даты!"}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'error': 'не предоставлен ID объекта'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Не предоставлен ID объекта'}, status=status.HTTP_400_BAD_REQUEST)
 
         # reservations = []
         # if object_id:
@@ -283,36 +283,54 @@ class BookingViewSet(APIView):
         arrive = parse_date(a) if (a := request.data.get('arrive', None)) else a
         departure = parse_date(a) if (a := request.data.get('departure', None)) else a
         tenant = str(a) if (a:=request.data.get('tenant', None)) else a
-
+        date_now = datetime.now().date()
+        print(date_now, arrive, departure)
         if object_id:
             if arrive and departure and tenant:
                 if arrive > departure:
                     return Response({'error':f'Дата заезда {arrive} позже чем дата отъезда {departure}!'}, status=status.HTTP_400_BAD_REQUEST)
+                elif arrive < date_now and departure < date_now:
+                    return Response(
+                        {'error': f'Дата заезда {arrive} и отъезда {departure} уже прошли! Текущая дата {date_now.strftime("%d-%m-%Y")}!'},
+                        status=status.HTTP_400_BAD_REQUEST)
+                elif arrive < date_now:
+                    return Response({'error': f'Дата заезда {arrive} уже прошла! Текущая дата {date_now.strftime("%d-%m-%Y")}!'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+                elif departure < date_now:
+                    return Response(
+                        {'error': f'Дата заезда {departure} уже прошла! Текущая дата {date_now.strftime("%%d-%m-%Y")}!'},
+                        status=status.HTTP_400_BAD_REQUEST)
+                elif arrive == departure:
+                    return Response(
+                        {
+                            'error': f'Дата заезда {arrive} и отъезда {departure} совпадают! Отличие должно быть минимум на 1 день!'},
+                        status=status.HTTP_400_BAD_REQUEST)
                 serializer = serializers.ReservationSerializer(data={'tenant':tenant, 'room':object_id, 'start_date': arrive, 'end_date': departure, 'is_confirmed': True})
                 # serializer = serializers.ReservationSerializer(data=kwargs.setdefault('is_confirmed', True))
                 if serializer.is_valid():
-                    reservations = models.ReservationModel.objects.filter(
-                                    Q(is_confirmed=True) &
-                                    (
-                                            (
-                                                    Q(start_date__range=(arrive, departure)) |
-                                                    Q(end_date__range=(arrive, departure))
-                                            ) |
-                                            (
-                                                    Q(start_date__lt=arrive) &
-                                                    Q(start_date__lt=departure) &
-                                                    Q(end_date__gt=arrive) &
-                                                    Q(end_date__gt=departure)
 
-                                            ) |
-                                            (
-                                                    Q(start_date__gt=arrive) &
-                                                    Q(start_date__lt=departure) &
-                                                    Q(end_date__gt=arrive) &
-                                                    Q(end_date__lt=departure)
-                                            )
-                                    )
+                    reservations = models.ReservationModel.objects.filter(
+                        Q(is_confirmed=True) &
+                        (
+                                (
+                                        Q(start_date__range=(arrive, departure)) |
+                                        Q(end_date__range=(arrive, departure))
+                                ) |
+                                (
+                                        Q(start_date__lt=arrive) &
+                                        Q(start_date__lt=departure) &
+                                        Q(end_date__gt=arrive) &
+                                        Q(end_date__gt=departure)
+
+                                ) |
+                                (
+                                        Q(start_date__gt=arrive) &
+                                        Q(start_date__lt=departure) &
+                                        Q(end_date__gt=arrive) &
+                                        Q(end_date__lt=departure)
                                 )
+                        )
+                    )
 
                     room_id_list = [reservation.room_id for reservation in reservations]
                     if serializer.validated_data.get("room") in room_id_list:
@@ -327,27 +345,6 @@ class BookingViewSet(APIView):
         else:
             return Response({"error": "Пожалуйста укажите валидные данные формы!"}, status=status.HTTP_400_BAD_REQUEST)
 
-
-# class ImagesViewSet(viewsets.ModelViewSet):
-#
-#     permission_classes = (permissions.AllowAny,)
-#     serializer_class = serializers.ImagesSerializer
-#     queryset = models.ImagesModel.objects.all()
-#     lookup_field = 'room_object_id'
-#
-#     def retrieve(self, request, *args, **kwargs):
-#         object_id = self.kwargs.get('room_object_id', None)
-#         if object_id:
-#             queryset = models.ImagesModel.objects.filter(room_object_id=object_id)
-#             serializer = serializers.ImagesSerializer(queryset, many=True)
-#
-#             return Response({"images": serializer.data}, status=status.HTTP_200_OK)
-#             # return Response(queryset, status=status.HTTP_200_OK)
-#         else:
-#             return Response({"error":"Не указан id объъекта"}, status=status.HTTP_400_BAD_REQUEST)
-#         instance = self.get_object()
-#         serializer = self.get_serializer(instance)
-#         return Response(serializer.data)
 
 class ImagesViewSet(APIView):
     permission_classes = (permissions.AllowAny,)
