@@ -129,3 +129,8 @@ class AllStarsObjectRoomSerializer(serializers.ModelSerializer):
         model = models.RatingModel
         fields = '__all__'
 
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.FavoritesModel
+        fields = '__all__'

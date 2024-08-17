@@ -361,3 +361,32 @@ class ImagesViewSet(APIView):
             return Response({"images": serializer.data}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'не предоставлен или указан неверный ID объекта'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FavoriteViewSet(APIView):
+    # permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = serializers.FavoriteSerializer
+
+    def get(self, *args, **kwargs):
+        return Response({'method GET': "success, in development"})
+
+    def post(self, request, *args, **kwargs):
+        object_id = request.data.get('room_object', None)
+        user = request.data.get('user', None)
+        if object_id:
+            if user:
+                serializer = serializers.FavoriteSerializer(data=request.data)
+                if serializer.is_valid():
+
+                    serializer.save()
+                    return Response({'success': "Добавлено в избранное!"}, status=status.HTTP_200_OK)
+                else:
+                    models.FavoritesModel.objects.filter(user_id=user, room_object_id=object_id).delete()
+                    print(serializer.errors.get('non_field_errors', 'Ошибка валидации данных сериализатора.')[0])
+                    return Response({"success": "Объект удален из избранного!"}, status=status.HTTP_200_OK)
+
+            else:
+                return Response({'error': "Неверный формат id пользователя"})
+        else:
+            return Response({'error':"Неверный формат id объекта"})

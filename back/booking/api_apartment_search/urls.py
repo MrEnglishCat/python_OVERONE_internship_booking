@@ -24,6 +24,9 @@ urlpatterns = [
     path('booking/<id>', views.BookingViewSet.as_view(), name='booking'),
     path('get_object_images/<room_object_id>', views.ImagesViewSet.as_view(), name='get_object_images'),
     path('update_rating', views.UpdateRatingViewSet.as_view(), name="update_rating"),
+    path('add_to_favorite', views.FavoriteViewSet.as_view(), name="add_to_favorite"),
+
+
     path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),

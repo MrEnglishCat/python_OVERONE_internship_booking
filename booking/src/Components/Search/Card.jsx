@@ -60,13 +60,8 @@ const Card = (props) => {
                     console.log(error);
                 });
             };
-
             getImages();
-
-
             getStars();
-
-
         }, [props.item.id]
     );
 
@@ -252,7 +247,7 @@ const Card = (props) => {
                                                 <div className="col align-text-center"></div>
 
                                                 <div className="col-lg-8 align-text-center">
-                                                    <div className="">Пока что отзывов нету. Будьте
+                                                    Пока что отзывов нету. Будьте
                                                         первым! <br/>
                                                         {sessionStorage.getItem("auth_token") ?
                                                             <SendReview/>
@@ -261,7 +256,6 @@ const Card = (props) => {
                                                                 оставить
                                                                 отзыв!
                                                             </p>}
-                                                    </div>
                                                 </div>
                                                 <div className="col align-text-center"></div>
                                             </div>
@@ -294,7 +288,7 @@ const Card = (props) => {
                     </div>
                 </div>
                 <div className="col-lg-4">
-                    <Booking prepayment={props.item.prepayment} payment_day={props.item.payment_day}/>
+                    <Booking prepayment={props.item.prepayment} payment_day={props.item.payment_day} room_object={props.item.id}/>
                 </div>
             </div>
             <Routes>

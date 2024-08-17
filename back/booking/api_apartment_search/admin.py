@@ -187,7 +187,7 @@ class InlineImageAdmin(admin.TabularInline):
 @admin.register(models.FavoritesModel)
 class FavoritesAdmin(admin.ModelAdmin):
     list_select_related = True
-    list_display = ('user', 'room_object')
+    list_display = ('user', 'room_object', 'create_datetime')
 
 
 

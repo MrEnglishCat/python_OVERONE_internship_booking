@@ -3,6 +3,7 @@ import DatePicker from "react-datepicker";
 import CustomDatepicker from "./CustomDatepicker";
 import axios from "axios";
 import {Button} from '@mui/material'
+import Error from "../General page/Error";
 
 
 const Booking = (props) => {
@@ -18,12 +19,20 @@ const Booking = (props) => {
     const API_NBRB_USD_CURRENCY = "https://api.nbrb.by/exrates/rates/431"
     const API_REFRESH = "http://127.0.0.1:8000/api/v1/auth/token/refresh/";
     const API_VERIFY = "http://127.0.0.1:8000/api/v1/auth/token/verify/";
+    const API_FAVORITE = "http://127.0.0.1:8000/api/v1/add_to_favorite"
+
 
     const HEADERS = {
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7\n',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     };
     const startDate = document.getElementById('startDate')
     const endDate = document.getElementById('endDate')
+    const favoritesListen = document.getElementById('favorites');
+    // if (favoritesListen) {
+    //     favoritesListen.addEventListener('favorite', function (event) {
+    //         console.log('Произошло событие favorite', event.type)
+    //     });
+    // }
     const [days, setDays] = useState(1);
 
 
@@ -44,7 +53,8 @@ const Booking = (props) => {
 
             console.log("days", days)
 
-        };
+        }
+
 
         setDays(endDate - startDate)
         console.log("days", days)
@@ -61,7 +71,7 @@ const Booking = (props) => {
             return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         }).join(''));
         return JSON.parse(jsonPayload);
-    };
+    }
 
     async function reset_tokens(refresh_token) {
         console.log("tokens_REFRESH", refresh_token)
@@ -95,7 +105,7 @@ const Booking = (props) => {
             alert("Для запроса нужна повторная авторизация")
 
         }
-    };
+    }
 
     async function verify_token(ta, tr) {
         console.log("tokens_VERIFY", ta)
@@ -127,6 +137,8 @@ const Booking = (props) => {
     }
 
     useEffect(() => {
+
+
             const ExchangeUsd = async () => {
                 let response = await fetch(API_NBRB_USD_CURRENCY, {method: "GET", headers: HEADERS});
 
@@ -152,7 +164,7 @@ const Booking = (props) => {
             } else {
                 console.log("NO TOKENS", sessionStorage);
             }
-            ;
+
 
         },
         []
@@ -188,8 +200,8 @@ const Booking = (props) => {
             }
         } else {
             var tk = {
-                access:'false',
-                refresh:'false'
+                access: 'false',
+                refresh: 'false'
             }
         }
 
@@ -227,6 +239,55 @@ const Booking = (props) => {
     };
 
 
+    const handleFavorite = async (event) => {
+
+
+        if (sessionStorage.getItem("auth_token")) {
+            // let tokens = JSON.parse(sessionStorage.getItem("auth_token"));
+            let tokens = JSON.parse(sessionStorage.getItem("auth_token"));
+            let user = parseJwt(tokens.refresh).username;
+            let user_id = parseJwt(tokens.refresh).user_id;
+            setUsername(user);
+            setUserId(user_id)
+
+
+            let response = await fetch(
+                API_FAVORITE,
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        user: user_id,
+                        room_object: props.room_object
+                    })
+                    ,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "*/*",
+                        // "Authorization": `Bearer ${tk.access}`
+
+                        // 'Cache-Control': 'no-cache',
+                    },
+                }
+            )
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log("data_success", data)
+                setSuccess(data)
+            } else {
+                let error = await response.json();
+                console.log("data_error", error.error);
+                setError(error)
+            }
+
+            console.log('____ERRROR____', error)
+        } else {
+            console.log("NO TOKENS/ need auth",);
+        }
+
+
+    };
+
     return (
         <div className="position-fixed ">
             <div className="container-fluid ">
@@ -234,24 +295,24 @@ const Booking = (props) => {
                     <div className="row">
                         <div className="col">
 
-                            <a href="#" className="btn btn-outline-success ">
+                            <Button id="favorite" variant="outlined" color="success" onClick={handleFavorite}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                      className="bi bi-suit-heart" viewBox="0 0 16 16">
                                     <path
                                         d="m8 6.236-.894-1.789c-.222-.443-.607-1.08-1.152-1.595C5.418 2.345 4.776 2 4 2 2.324 2 1 3.326 1 4.92c0 1.211.554 2.066 1.868 3.37.337.334.721.695 1.146 1.093C5.122 10.423 6.5 11.717 8 13.447c1.5-1.73 2.878-3.024 3.986-4.064.425-.398.81-.76 1.146-1.093C14.446 6.986 15 6.131 15 4.92 15 3.326 13.676 2 12 2c-.777 0-1.418.345-1.954.852-.545.515-.93 1.152-1.152 1.595L8 6.236zm.392 8.292a.513.513 0 0 1-.784 0c-1.601-1.902-3.05-3.262-4.243-4.381C1.3 8.208 0 6.989 0 4.92 0 2.755 1.79 1 4 1c1.6 0 2.719 1.05 3.404 2.008.26.365.458.716.596.992a7.55 7.55 0 0 1 .596-.992C9.281 2.049 10.4 1 12 1c2.21 0 4 1.755 4 3.92 0 2.069-1.3 3.288-3.365 5.227-1.193 1.12-2.642 2.48-4.243 4.38z"/>
                                 </svg>
                                 &nbsp;В избранное
-                            </a>
+                            </Button>
                         </div>
                         <div className="col ">
-                            <a href="#" className="btn btn-outline-success">
+                            <Button id="shared" variant="outlined" color="success">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                      className="bi bi-share" viewBox="0 0 16 16">
                                     <path
                                         d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
                                 </svg>
                                 &nbsp;Поделиться
-                            </a>
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -290,9 +351,7 @@ const Booking = (props) => {
                     </div>
                 </form>
                 <br/>
-                {error ?
-                    <div className="alert alert-danger">{error.error}{error.detail}</div> : success ?
-                        <div className="alert alert-success">{success.success}</div> : ""}
+                <Error error={error} success={success}/>
             </div>
         </div>
     );
