@@ -4,7 +4,7 @@ import CustomDatepicker from "./CustomDatepicker";
 import axios from "axios";
 import {Button} from '@mui/material'
 import Error from "../General page/Error";
-
+import Alert from "@mui/material/Alert";
 
 const Booking = (props) => {
 
@@ -13,7 +13,7 @@ const Booking = (props) => {
     const [exchangeUSD, setExchangeUSD] = useState(0);
     const [username, setUsername] = useState("");
     const [user_id, setUserId] = useState(null);
-    const [error, setError] = useState();
+    const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
     const API_BOOKING = "http://127.0.0.1:8000/api/v1/booking/1"
     const API_NBRB_USD_CURRENCY = "https://api.nbrb.by/exrates/rates/431"
@@ -44,10 +44,12 @@ const Booking = (props) => {
                 var today = new Date().toISOString().split('T')[0];
                 startDate.setAttribute('value', today)
                 setStartD(startDate.value.toDateString)
+                setDays(endDate - startDate)
             })
             endDate.addEventListener('change', function (event) {
                     console.log('Произошло событие', event.type)
                     setEndD(endDate.value.toDateString)
+                    setDays(endDate - startDate)
                 }
             );
 
@@ -228,16 +230,24 @@ const Booking = (props) => {
         );
         if (response.ok) {
             const data = await response.json();
-            console.log("data", data)
+            console.log("data_success_Success", data)
             setSuccess(data)
         } else {
             let error = await response.json();
-            console.log("data", error.error);
+            console.log("data_success_Error", error.error);
             setError(error)
         }
 
     };
 
+
+    useEffect(() => {
+        console.log('error_useEffect', error)
+        console.log('success_useEffect', success)
+        setError(error)
+        setSuccess(success)
+
+    }, [error, success])
 
     const handleFavorite = async (event) => {
 
@@ -272,11 +282,11 @@ const Booking = (props) => {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log("data_success", data)
+                console.log("data_success_favorite", data)
                 setSuccess(data)
             } else {
                 let error = await response.json();
-                console.log("data_error", error.error);
+                console.log("data_error_favorite", error.error);
                 setError(error)
             }
 
@@ -351,7 +361,11 @@ const Booking = (props) => {
                     </div>
                 </form>
                 <br/>
-                <Error error={error} success={success}/>
+                {
+                    error ?
+                        <Alert severity="error">{error.error}{error.detail}</Alert> : success ?
+                            <Alert severity="success">{success.success}</Alert> : ""
+                }
             </div>
         </div>
     );

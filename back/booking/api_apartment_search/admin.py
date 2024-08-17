@@ -153,6 +153,7 @@ class PlacingRulesAdmin(admin.ModelAdmin):
 class InlineReserveAdmin(admin.TabularInline):
     list_select_related = True
     model = models.ReservationModel
+    ordering = ('start_date',)
     extra = 1
     can_delete = True
     classes = ['collapse']

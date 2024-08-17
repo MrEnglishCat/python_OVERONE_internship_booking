@@ -1,4 +1,5 @@
 import React from 'react';
+import Alert from '@mui/material/Alert';
 
 const Error = (props) => {
 
@@ -6,8 +7,8 @@ const Error = (props) => {
         <div>
             {
                 props.error ?
-                    <div className="alert alert-danger">{props.error.error}{props.error.detail}</div> : props.success ?
-                        <div className="alert alert-success">{props.success.success}</div> : ""
+                    <Alert severity="error">{props.error.error}{props.error.detail}</Alert> : props.success ?
+                        <Alert severity="success">{props.success.success}</Alert> : ""
             }
         </div>
     );
