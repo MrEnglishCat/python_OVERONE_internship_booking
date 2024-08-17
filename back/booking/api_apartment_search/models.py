@@ -471,13 +471,15 @@ class ObjectRoomModel(models.Model):
 
 
 class FavoritesModel(models.Model):
-    room_object = models.ForeignKey(ObjectRoomModel, on_delete=models.DO_NOTHING, verbose_name="Объект")
+    room_object = models.ForeignKey(ObjectRoomModel,  on_delete=models.DO_NOTHING, verbose_name="Объект")
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="Пользователь")
+    create_datetime = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
     class Meta:
         db_table = '"api_favorites"'
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
+        unique_together = (('room_object', 'user'),)
 
 
 class ReservationModel(models.Model):
