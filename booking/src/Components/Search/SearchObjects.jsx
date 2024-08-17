@@ -3,6 +3,8 @@ import axios from "axios"
 import BriefItemCard from "./BriefItemCard";
 import NavigateHeader from "../General page/NavigateHeader";
 import Footer from "../General page/Footer";
+// import Box from '@mui/material/Box';
+// import TextField from '@mui/material/TextField';
 
 const Search = () => {
     const API_URL_SEARCH = "http://127.0.0.1:8000/api/v1/search/?search="
@@ -28,7 +30,7 @@ const Search = () => {
         const headers = {
             'Accept': '*/*',
         };
-        responseData = await axios.get(API_URL_SEARCH + data_input_location.value + "&arrive=" + data_input_datetime_check_in.value + "&departure=" + data_input_datetime_departure.value , {headers});
+        responseData = await axios.get(API_URL_SEARCH + data_input_location.value + "&arrive=" + data_input_datetime_check_in.value + "&departure=" + data_input_datetime_departure.value, {headers});
         // ниже В responseData появился атрибут results т к в DRF добавил пагинацию
         setSearchData(await responseData.data.results);
         setStartSearch(true)
@@ -38,19 +40,22 @@ const Search = () => {
     return (
         <div className="container ">
             <NavigateHeader token={token}/>
-            <div className="container  flex-auto " >
+            <div className="container  flex-auto ">
                 <div className="card bg-light text-white   rounded-5">
-                    <img src="/image/background/search_background.jpg" className="card-img img-fluid   rounded-5" alt="..." style={{maxWidth: 1250}}/>
+                    <img src="/image/background/search_background.jpg" className="card-img img-fluid   rounded-5"
+                         alt="..." style={{maxWidth: 1250}}/>
                     <div className="card-img-overlay">
                         <div id="Search_bar" className="flex-auto"><br/>
                             <p className="display-2 fs-0 fw-bold text-center">Найдём, где остановиться!</p>
                             <br/>
                             <br/>
-                            <p className="lead text-center fs-3">Квартиры, отели, гостевые дома — 280 тысяч вариантов для
+                            <p className="lead text-center fs-3">Квартиры, отели, гостевые дома — 280 тысяч вариантов
+                                для
                                 поездок по
                                 России и
                                 зарубежью</p><br/>
-                            <div className="input-group mb-5" style={{width: 750, margin: 'auto'}}>
+                            <div className="input-group mb-5 flex-auto" style={{width: 950, margin: 'auto'}}>
+
                                 <input type="text" className="form-control form-control-lg input-font-size-lg"
                                        placeholder="Курорт, город или адрес"
                                        aria-label="Курорт, город или адрес" aria-describedby="button-addon2"

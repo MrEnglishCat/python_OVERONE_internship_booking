@@ -19,6 +19,7 @@ const DetailCard = (props) => {
         'Accept': '*/*',
         // "Authorization": `Bearer ${sessionStorage.getItem("auth_token")}`
     };
+    console.log('DETAIL CARD ___ ', props.images)
 
     useEffect(
         () => {
@@ -44,7 +45,7 @@ const DetailCard = (props) => {
     return (
         <div>
             <NavigateHeader/>
-             <Card item={ObjectRoom} reviews={reviews} images={props.images}/>
+             <Card item={ObjectRoom} reviews={reviews} image={props.images}/>
             <Footer/>
         </div>
 

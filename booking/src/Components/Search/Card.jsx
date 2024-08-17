@@ -9,7 +9,11 @@ import TotalStars from "./reviews/TotalStars";
 import LoginPage from "../Authorization/LoginPage";
 import SendReview from "./reviews/SendReview";
 import Images from "../General page/Images"
+import ImagesC from "../Main page/ImageCarousel";
+import Image from "../General page/Image";
 
+
+import {Paper, Box, ImageList} from '@mui/material'
 const Card = (props) => {
 
     // получаем параметры
@@ -25,8 +29,11 @@ const Card = (props) => {
     };
 
     const API_ALL_STARTS_RATING = "http://127.0.0.1:8000/api/v1/get_object_rating/"
+    const API_GET_IMAGES = "http://127.0.0.1:8000/api/v1/get_object_images/"
+
     const [stars, setStars] = useState({})
     const [datetime, setDateTime] = useState();
+    const [images, setImages] = useState([]);
 
     const HEADERS = {
         'Accept': '*/*',
@@ -45,14 +52,25 @@ const Card = (props) => {
 
     useEffect(
         () => {
+            async function getImages() {
+                await axios.get(API_GET_IMAGES + `${props.item.id}`).then((response) => {
+                    console.log("response.data.images", response.data.images);
+                    setImages(response.data.images);
+                }).catch((error) => {
+                    console.log(error);
+                });
+            };
+
+            getImages();
+
+
             getStars();
-            let dt = new Date();
-            console.log(dt);
+
 
         }, [props.item.id]
     );
 
-
+    console.log('______CARD_____', images)
     return (
         <div className="container  ">
             <div className="row">
@@ -97,53 +115,13 @@ const Card = (props) => {
                             </span>
                         </p>
                         <div className="container">
-                            <div id="carouselExampleIndicators" className=" shadow-lg   rounded-5 carousel slide" data-bs-ride="carousel">
-                                <div className="carousel-indicators">
-                                    <button type="button" data-bs-target="#carouselExampleIndicators"
-                                            data-bs-slide-to="0"
-                                            className="active" aria-current="true" aria-label="Slide 1"></button>
-                                    <button type="button" data-bs-target="#carouselExampleIndicators"
-                                            data-bs-slide-to="1"
-                                            aria-label="Slide 2"></button>
-                                    <button type="button" data-bs-target="#carouselExampleIndicators"
-                                            data-bs-slide-to="2"
-                                            aria-label="Slide 3"></button>
-                                </div>
-                                <div className="carousel-inner   rounded-5">
-                                    {/*{*/}
-                                    {/*    props.images ? props.images.map((image, i) => {})*/}
-                                    {/*}*/}
-                                    <div className="carousel-item active">
-                                        <img src="/image/user_objects/1/6.webp" className="d-block w-100   rounded-5"
-                                             alt="..." width="1000"
-                                             height="600" style={{display: "flex", objectFit: "cover"}}/>
-                                    </div>
-                                    <div className="carousel-item">
-                                        <img src="/image/user_objects/1/5.webp" className="d-block w-100  rounded-5"
-                                             alt="..." width="1000"
-                                             height="600" style={{display: "flex", objectFit: "cover"}}/>
-                                    </div>
-                                    <div className="carousel-item">
-                                        <img src="/image/user_objects/1/4.webp" className="d-block w-100   rounded-5"
-                                             alt="..." width="1000"
-                                             height="600" style={{display: "flex", objectFit: "cover"}}/>
-                                    </div>
-                                </div>
-                                <button className="carousel-control-prev" type="button"
-                                        data-bs-target="#carouselExampleIndicators"
-                                        data-bs-slide="prev">
-                                    <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span className="visually-hidden">Previous</span>
-                                </button>
-                                <button className="carousel-control-next" type="button"
-                                        data-bs-target="#carouselExampleIndicators"
-                                        data-bs-slide="next">
-                                    <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                                    <span className="visually-hidden">Next</span>
-                                </button>
-                            </div>
+                            {/*<div className="col-lg-3 col-12 ">*/}
+                                {
+                                    images ? <Box sx={{ maxWidth: 800, flexGrow: 1, margin: 'auto', mt: 5 }}><ImagesC image_list={images} height={600}/></Box> :
+                                        <Image image="/image/user_objects/nophoto_object.jpg"/>
+                                }
+                            {/*</div>*/}
                         </div>
-
                         <br/>
                         <div className="item-details shadow-lg p-3  rounded-5">
                             <div className="item-details-info">
@@ -327,8 +305,7 @@ const Card = (props) => {
             </Routes>
         </div>
 
-    )
-        ;
+    );
 };
 
 export default Card;

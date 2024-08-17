@@ -184,10 +184,15 @@ class InlineImageAdmin(admin.TabularInline):
     classes = ['collapse']
 
 
+@admin.register(models.FavoritesModel)
+class FavoritesAdmin(admin.ModelAdmin):
+    list_select_related = True
+    list_display = ('user', 'room_object')
+
 
 
 @admin.register(models.ObjectRoomModel)
-class ObjectRoomModel(admin.ModelAdmin):
+class ObjectRoomAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'create_datetime', 'update_datetime', 'city',)
 
     list_display_links = ('title',)
@@ -197,3 +202,4 @@ class ObjectRoomModel(admin.ModelAdmin):
     raw_id_fields = ('city', 'building_info')
     inlines = (InlineImageAdmin, InlineReserveAdmin, InlineReviewsAdmin)
     # list_select_related = True
+

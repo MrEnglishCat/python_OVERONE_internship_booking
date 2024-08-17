@@ -25,6 +25,7 @@ function App() {
                     <Route path="/" element={<HomePage/>}/>
                     <Route path="/search" element={<Search/>}/>
                     <Route path="/search/:id" element={<DetailCard/>}/>
+                    {/*<Route path="/search/*" element={<Search/>}/>*/}
                     <Route path="/login" element={<LoginPage/>}/>
                     <Route path="/register" element={<RegisterPage/>}/>
                     <Route path="/forgot" element={<ForgotPage/>}/>

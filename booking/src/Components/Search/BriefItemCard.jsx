@@ -2,7 +2,8 @@ import React, {Component, useEffect, useState} from "react";
 import {Route, useParams, Link, Routes} from "react-router-dom";
 import DetailCard from "./DetailCard";
 import axios from "axios";
-import Images from "../General page/Images";
+import Image from "../General page/Image";
+import ImagesC from "../Main page/ImageCarousel";
 
 const BriefItemCard = (props) => {
     const [objectRooms, setObjectRooms] = useState([]);
@@ -33,7 +34,7 @@ const BriefItemCard = (props) => {
             async function getStars() {
                 const response = await axios.get(API_ALL_STARTS_RATING + props.item.id + '/', {headers: HEADERS})
                     .then((response) => {
-                        setStars(response.data.images);
+                        setStars(response.data);
                     }).catch((error) => {
                         console.log(error);
                     });
@@ -58,8 +59,8 @@ const BriefItemCard = (props) => {
             };
 
             getImages();
-            getStars();
             getLenghtReviews();
+            getStars();
         }, [props.item.id]
     );
 
@@ -71,58 +72,15 @@ const BriefItemCard = (props) => {
             {/*<Link to={`/search/${props.item.id}/`} state={props}*/}
             {/*      className="link-offset-2 link-underline link-underline-opacity-0">*/}
             <div className="container ">
-                <div className="card shadow-lg rounded-lg rounded-5"
+                <div className="card shadow-lg rounded-lg rounded-end-5"
                      style={{maxWidth: 1100, height: "auto", margin: 'auto'}}>
                     <div className="row">
-                        <div className="col-lg-3 col-12 ">
-                                <div id={`selector-${props.item.id}`} className=" shadow-lg   rounded-5 carousel slide"
-                                     data-bs-ride="carousel">
-                                    <div className="carousel-indicators">
-                                        <button type="button" data-bs-target={`#selector-${props.item.id}`}
-                                                data-bs-slide-to="0"
-                                                className="active" aria-current="true" aria-label="Slide 1"></button>
-                                        <button type="button" data-bs-target={`#selector-${props.item.id}`}
-                                                data-bs-slide-to="1"
-                                                aria-label="Slide 2"></button>
-                                        <button type="button" data-bs-target={`#selector-${props.item.id}`}
-                                                data-bs-slide-to="2"
-                                                aria-label="Slide 3"></button>
-                                    </div>
-                                    <div className="carousel-inner   rounded-5">
-                                        {/*{*/}
-                                        {/*    props.images ? props.images.map((image, i) => {})*/}
-                                        {/*}*/}
-                                        <div className="carousel-item active">
-                                            <img src="/image/user_objects/1/6.webp"
-                                                 className="d-block   rounded-5"
-                                                 alt="..."
-                                                 height="200"  style={{display: "flex", objectFit: "cover"}}/>
-                                        </div>
-                                        <div className="carousel-item">
-                                            <img src="/image/user_objects/1/5.webp" className="d-block w-100  rounded-5"
-                                                 alt="..."
-                                                 height="200" style={{display: "flex", objectFit: "cover"}}/>
-                                        </div>
-                                        <div className="carousel-item">
-                                            <img src="/image/user_objects/1/4.webp"
-                                                 className="d-block w-100   rounded-5"
-                                                 alt="..."
-                                                 height="200" style={{display: "flex", objectFit: "cover"}}/>
-                                        </div>
-                                    </div>
-                                    <button className="carousel-control-prev" type="button"
-                                            data-bs-target={`#selector-${props.item.id}`}
-                                            data-bs-slide="prev">
-                                        <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                                        <span className="visually-hidden">Previous</span>
-                                    </button>
-                                    <button className="carousel-control-next" type="button"
-                                            data-bs-target={`#selector-${props.item.id}`}
-                                            data-bs-slide="next">
-                                        <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                                        <span className="visually-hidden">Next</span>
-                                    </button>
-                                </div>
+                        <div className="col-lg-3 col-12">
+                            {/*<Images image_list={images} id={props.item.id} />*/}
+                            {
+                                images.length ? <ImagesC image_list={images}/> : <Image image="/image/user_objects/nophoto_object.jpg"/>
+
+                            }
 
 
                         </div>
@@ -189,7 +147,7 @@ const BriefItemCard = (props) => {
                                                                             stars.timeliness_of_check_in__avg
                                                                         ) / 6
                                                                     ).toFixed(1)
-                                                                    : ""
+                                                                    : "No stars"
                                                             }
                                                             </span>
 

@@ -2,6 +2,7 @@ import React, {Component, useState, useEffect, Link} from "react";
 import DatePicker from "react-datepicker";
 import CustomDatepicker from "./CustomDatepicker";
 import axios from "axios";
+import {Button} from '@mui/material'
 
 
 const Booking = (props) => {
@@ -176,17 +177,20 @@ const Booking = (props) => {
         const arrive = await document.getElementById("startDate").value;
         const departure = await document.getElementById("endDate").value;
         if (sessionStorage.getItem("auth_token")) {
-            let tk = JSON.parse(sessionStorage.getItem("auth_token"));
+            var tk = JSON.parse(sessionStorage.getItem("auth_token"));
             console.log("tokens_REQUESTS", tk.refresh)
 
             let isValid = await verify_token(tk.access, tk.refresh);
 
             if (!isValid) {
-                const tk = JSON.parse(sessionStorage.getItem("auth_token"));
+                var tk = JSON.parse(sessionStorage.getItem("auth_token"));
                 console.log("tk.access, tk.refresh", tk.access, tk.refresh);
             }
         } else {
-            var tk = {}
+            var tk = {
+                access:'false',
+                refresh:'false'
+            }
         }
 
 
@@ -280,7 +284,7 @@ const Booking = (props) => {
                         <br/>
                         {/*<div className="position-fixed">...</div>*/}
                         <div className="row ">
-                            <button type="submit" className="btn btn-success ">Хочу забронировать</button>
+                            <Button type="submit" variant="outlined" color="success">Хочу забронировать</Button>
                         </div>
                         <br/>
                     </div>

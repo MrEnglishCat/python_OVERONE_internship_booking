@@ -95,7 +95,7 @@ const NavigateHeader = (token) => {
             return true
         } else {
             console.log('TOKENS IS NOT VALID')
-            reset_tokens(tr)
+            await reset_tokens(tr)
             console.log('TOKENS IS UPDATE')
             return false
         }
@@ -103,14 +103,23 @@ const NavigateHeader = (token) => {
 
 
     async function logout() {
-        let tk = JSON.parse(sessionStorage.getItem("auth_token"));
-        console.log("tokens_LOGOUT", tk.refresh)
+        if  (sessionStorage.getItem("auth_token")) {
+            var tk = JSON.parse(sessionStorage.getItem("auth_token"));
+            console.log("get_tokens_from_sessionStorage_LOGOUT", tk.refresh)
 
-        let isValid = await verify_token(tk.access, tk.refresh);
+            let isValid = await verify_token(tk.access, tk.refresh);
+            if (!isValid) {
+                var tk = JSON.parse(sessionStorage.getItem("auth_token"));
+            }
 
-        if (!isValid) {
-            let tk = JSON.parse(sessionStorage.getItem("auth_token"));
+        } else {
+            var tk = {
+                access:'false',
+                refresh:'false'
+            }
         }
+
+
         let response = await fetch(
             API_LOGOUT,
             {
