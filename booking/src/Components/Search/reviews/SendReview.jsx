@@ -78,6 +78,7 @@ const SendReview = (props) => {
                                 placeholder="Оценка от 0 до 10"
                                 type="number"
                                 InputProps={{inputProps: {min: 0, max: 10}}}
+                                fullWidth={true}
                                 size="small"
                                 InputLabelProps={{
                                     shrink: true,
@@ -90,6 +91,7 @@ const SendReview = (props) => {
                                     заселения"
                                 placeholder="Оценка от 0 до 10"
                                 type="number"
+                                fullWidth={true}
                                 size="small"
                                 InputProps={{inputProps: {min: 0, max: 10}}}
                                 InputLabelProps={{
@@ -101,6 +103,7 @@ const SendReview = (props) => {
                                 label="Расположение"
                                 placeholder="Оценка от 0 до 10"
                                 type="number"
+                                fullWidth={true}
                                 size="small"
                                 InputProps={{inputProps: {min: 0, max: 10}}}
                                 InputLabelProps={{
@@ -116,6 +119,7 @@ const SendReview = (props) => {
                                     фото"
                                 placeholder="Оценка от 0 до 10"
                                 type="number"
+                                fullWidth={true}
                                 size="small"
                                 InputProps={{inputProps: {min: 0, max: 10}}}
                                 InputLabelProps={{
@@ -127,6 +131,7 @@ const SendReview = (props) => {
                                 label="Цена - качество"
                                 placeholder="Оценка от 0 до 10"
                                 type="number"
+                                fullWidth={true}
                                 size="small"
                                 InputProps={{inputProps: {min: 0, max: 10}}}
                                 InputLabelProps={{
@@ -139,6 +144,7 @@ const SendReview = (props) => {
                                     обслуживания"
                                 placeholder="Оценка от 0 до 10"
                                 type="number"
+                                fullWidth={true}
                                 size="small"
                                 InputProps={{inputProps: {min: 0, max: 10}}}
                                 InputLabelProps={{

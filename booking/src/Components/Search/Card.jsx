@@ -250,14 +250,14 @@ const Card = (props) => {
 
                                                 <div className="col align-text-center">
                                                     Пока что отзывов нету. Будьте
-                                                        первым! <br/>
-                                                        {sessionStorage.getItem("auth_token") ?
-                                                            <SendReview item={props.item}/>
-                                                            : <p>
-                                                                <a href="/login">Авторизуйтесь</a> для того что бы
-                                                                оставить
-                                                                отзыв!
-                                                            </p>}
+                                                    первым! <br/><br/><br/>
+                                                    {sessionStorage.getItem("auth_token") ?
+                                                        <SendReview room_object={props.item}/>
+                                                        : <p>
+                                                            <a href="/login">Авторизуйтесь</a> для того что бы
+                                                            оставить
+                                                            отзыв!
+                                                        </p>}
                                                 </div>
                                                 <div className="col align-text-center"></div>
                                             </div>

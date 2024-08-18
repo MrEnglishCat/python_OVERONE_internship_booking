@@ -400,7 +400,7 @@ class SendCommentViewSet(APIView):
 
     def post(self, request, *args, **kwargs):
         # TODO передать id юзера достать из jwt токена!
-        print(request.data)
+        # print(request.data)
         cleanliness = request.data.get('cleanliness', None)
         timeliness_of_check_in = request.data.get('timeliness_of_check_in', None)
         location = request.data.get('location', None)
@@ -426,26 +426,49 @@ class SendCommentViewSet(APIView):
         ):
             serializer_rating = serializers.RatingSerializer(
                 data={
-                    "cleanliness":cleanliness,
-                    "timeliness_of_check_in":timeliness_of_check_in,
-                    "location":location,
-                    "conformity_to_photos":conformity_to_photos,
-                    "price_quality":price_quality,
-                    "quality_of_service":quality_of_service,
-                    "room_object":room_object_id,
+                    "cleanliness": cleanliness,
+                    "timeliness_of_check_in": timeliness_of_check_in,
+                    "location": location,
+                    "conformity_to_photos": conformity_to_photos,
+                    "price_quality": price_quality,
+                    "quality_of_service": quality_of_service,
+                    "room_object": room_object_id,
                 }
             )
 
-            # serializer_review = serializers.ReviewSerializer(
-            #     data={
-            #         "review_text":review_text,
-            #         "room_object":room_object_id,
-            #         "user_id":user_id
-            #     }
-            # )
-
             if serializer_rating.is_valid():
                 print(serializer_rating.validated_data)
+                # {
+                #     'ratings': {
+                #         'non_field_errors': [
+                #             ErrorDetail(string='Недопустимые данные. Ожидался dictionary, но был получен str.',
+                #                         code='invalid')
+                #         ]
+                #     },
+                #     'user': {
+                #         'non_field_errors': [
+                #             ErrorDetail(string='Недопустимые данные. Ожидался dictionary, но был получен str.',
+                #                         code='invalid')
+                #         ]
+                #     },
+                #     'review_updated': [
+                #         ErrorDetail(string='Обязательное поле.', code='required')
+                #     ],
+                #     'review_created': [
+                #         ErrorDetail(string='Обязательное поле.', code='required')
+                #     ]
+                # }
+                serializer_review = serializers.ReviewsSerializer(
+                    data={
+                        "review_text": review_text,
+                        "room_object": room_object_id,
+                        "user": '1',
+                        "ratings": '2'
+                    }
+                )
+                serializer_review.is_valid()
+                print('review_serlz', serializer_review.validated_data, serializer_review.errors)
+
                 return Response({"success": "TEST SendComment"})
             else:
                 print('ERROR', serializer_rating.errors)

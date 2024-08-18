@@ -519,8 +519,8 @@ class RatingModel(models.Model):
 
 class ReviewsModel(models.Model):
     review_text = models.TextField( null=True, blank=True, verbose_name="Отзыв")
-    review_created = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
-    review_updated = models.DateTimeField(auto_now_add=True, verbose_name="Дата редактирования")
+    review_created = models.DateTimeField(auto_now_add=True, auto_created=True, verbose_name="Дата создания")
+    review_updated = models.DateTimeField(auto_now=True, null=True, blank=True, verbose_name="Дата редактирования")
     likes = models.PositiveIntegerField(default=0, verbose_name="Нравится")  # positive_sides
     dislikes = models.PositiveIntegerField(default=0, verbose_name="Не нравится")  # negative_sides
     room_object = models.ForeignKey(ObjectRoomModel, on_delete=models.DO_NOTHING, verbose_name="Объект")
