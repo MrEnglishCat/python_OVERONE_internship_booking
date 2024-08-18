@@ -28,11 +28,7 @@ const Booking = (props) => {
     const startDate = document.getElementById('startDate')
     const endDate = document.getElementById('endDate')
     const favoritesListen = document.getElementById('favorites');
-    // if (favoritesListen) {
-    //     favoritesListen.addEventListener('favorite', function (event) {
-    //         console.log('Произошло событие favorite', event.type)
-    //     });
-    // }
+    const [favorite, setFavorite] = useState(false)
     const [days, setDays] = useState(1);
 
 
@@ -241,14 +237,7 @@ const Booking = (props) => {
     };
 
 
-    useEffect(() => {
-        if (success) {
-        setSuccess(success)
-        } else {
-        setError(error)
-        }
 
-    }, [error, success])
 
     const handleFavorite = async (event) => {
         event.preventDefault();

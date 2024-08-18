@@ -25,6 +25,7 @@ urlpatterns = [
     path('get_object_images/<room_object_id>', views.ImagesViewSet.as_view(), name='get_object_images'),
     path('update_rating', views.UpdateRatingViewSet.as_view(), name="update_rating"),
     path('add_to_favorite', views.FavoriteViewSet.as_view(), name="add_to_favorite"),
+    path('send_comment', views.SendCommentViewSet.as_view(), name="send_comment"),
 
 
     path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

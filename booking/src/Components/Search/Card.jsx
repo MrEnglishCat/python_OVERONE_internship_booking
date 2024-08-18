@@ -11,6 +11,8 @@ import SendReview from "./reviews/SendReview";
 import Images from "../General page/Images"
 import ImagesC from "../Main page/ImageCarousel";
 import Image from "../General page/Image";
+import Textarea from "@mui/joy";
+
 
 
 import {Paper, Box, ImageList} from '@mui/material'
@@ -246,11 +248,11 @@ const Card = (props) => {
                                             <div className="row align-items-center">
                                                 <div className="col align-text-center"></div>
 
-                                                <div className="col-lg-8 align-text-center">
+                                                <div className="col align-text-center">
                                                     Пока что отзывов нету. Будьте
                                                         первым! <br/>
                                                         {sessionStorage.getItem("auth_token") ?
-                                                            <SendReview/>
+                                                            <SendReview item={props.item}/>
                                                             : <p>
                                                                 <a href="/login">Авторизуйтесь</a> для того что бы
                                                                 оставить
@@ -271,7 +273,7 @@ const Card = (props) => {
                                                 <TotalStars star={stars}/>
                                             <div className="container">
                                                 {sessionStorage.getItem("auth_token") ?
-                                                    <SendReview/>
+                                                    <SendReview room_object={props.item}/>
                                                     : <div className="col-md">
                                                         <a href="/login">Авторизуйтесь</a> для того что бы оставить
                                                         отзыв!

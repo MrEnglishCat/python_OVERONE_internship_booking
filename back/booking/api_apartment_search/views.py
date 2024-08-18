@@ -238,7 +238,7 @@ class BookingViewSet(APIView):
         departure = parse_date(a) if (a := self.kwargs.get('departure', None)) else None
         if object_id:
             if arrive and departure:
-                return Response({'success':'забронированы даты...'}, status=status.HTTP_200_OK)
+                return Response({'success': 'забронированы даты...'}, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "Пожалуйста, введите валидные даты!"}, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -280,22 +280,26 @@ class BookingViewSet(APIView):
         object_id = self.kwargs.get('id', None)
         arrive = parse_date(a) if (a := request.data.get('arrive', None)) else a
         departure = parse_date(a) if (a := request.data.get('departure', None)) else a
-        tenant = str(a) if (a:=request.data.get('tenant', None)) else a
+        tenant = str(a) if (a := request.data.get('tenant', None)) else a
         date_now = datetime.now().date()
         if object_id:
             if arrive and departure and tenant:
                 if arrive > departure:
-                    return Response({'error':f'Дата заезда {arrive} позже чем дата отъезда {departure}!'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'error': f'Дата заезда {arrive} позже чем дата отъезда {departure}!'},
+                                    status=status.HTTP_400_BAD_REQUEST)
                 elif arrive < date_now and departure < date_now:
                     return Response(
-                        {'error': f'Дата заезда {arrive} и отъезда {departure} уже прошли! Текущая дата {date_now.strftime("%d-%m-%Y")}!'},
+                        {
+                            'error': f'Дата заезда {arrive} и отъезда {departure} уже прошли! Текущая дата {date_now.strftime("%d-%m-%Y")}!'},
                         status=status.HTTP_400_BAD_REQUEST)
                 elif arrive < date_now:
-                    return Response({'error': f'Дата заезда {arrive} уже прошла! Текущая дата {date_now.strftime("%d-%m-%Y")}!'},
-                                    status=status.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        {'error': f'Дата заезда {arrive} уже прошла! Текущая дата {date_now.strftime("%d-%m-%Y")}!'},
+                        status=status.HTTP_400_BAD_REQUEST)
                 elif departure < date_now:
                     return Response(
-                        {'error': f'Дата заезда {departure} уже прошла! Текущая дата {date_now.strftime("%%d-%m-%Y")}!'},
+                        {
+                            'error': f'Дата заезда {departure} уже прошла! Текущая дата {date_now.strftime("%%d-%m-%Y")}!'},
                         status=status.HTTP_400_BAD_REQUEST)
                 elif arrive == departure:
                     return Response(
@@ -303,8 +307,9 @@ class BookingViewSet(APIView):
                             'error': f'Дата заезда {arrive} и отъезда {departure} совпадают! Отличие должно быть минимум на 1 день!'},
                         status=status.HTTP_400_BAD_REQUEST)
 
-
-                serializer = serializers.ReservationSerializer(data={'tenant':tenant, 'room':object_id, 'start_date': arrive, 'end_date': departure, 'is_confirmed': True})
+                serializer = serializers.ReservationSerializer(
+                    data={'tenant': tenant, 'room': object_id, 'start_date': arrive, 'end_date': departure,
+                          'is_confirmed': True})
                 if serializer.is_valid():
 
                     reservations = models.ReservationModel.objects.filter(
@@ -332,14 +337,16 @@ class BookingViewSet(APIView):
 
                     room_id_list = set((reservation.room_id for reservation in reservations))
                     if serializer.validated_data.get("room").id in room_id_list:
-                        return Response({'error':f'Указанные даты заняты!'}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({'error': f'Указанные даты заняты!'}, status=status.HTTP_400_BAD_REQUEST)
                     serializer.save()
-                    return Response({'success':'Дата забронирована!'}, status=status.HTTP_200_OK)
+                    return Response({'success': 'Дата забронирована!'}, status=status.HTTP_200_OK)
                 else:
                     # print(serializer.errors)
-                    return Response({'error':f'SERIALIZER: Указанные даты заняты!'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'error': f'SERIALIZER: Указанные даты заняты!'},
+                                    status=status.HTTP_400_BAD_REQUEST)
             else:
-                return Response({"error": "Пожалуйста укажите валидные данные формы!"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Пожалуйста укажите валидные данные формы!"},
+                                status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({"error": "Пожалуйста укажите валидные данные формы!"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -355,7 +362,8 @@ class ImagesViewSet(APIView):
             serializer = serializers.ImagesSerializer(queryset, many=True)
             return Response({"images": serializer.data}, status=status.HTTP_200_OK)
         else:
-            return Response({'error': 'не предоставлен или указан неверный ID объекта'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'не предоставлен или указан неверный ID объекта'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class FavoriteViewSet(APIView):
@@ -384,4 +392,54 @@ class FavoriteViewSet(APIView):
             else:
                 return Response({'error': "Неверный формат id пользователя"})
         else:
-            return Response({'error':"Неверный формат id объекта"})
+            return Response({'error': "Неверный формат id объекта"})
+
+
+class SendCommentViewSet(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        # TODO передать id юзера достать из jwt токена!
+        print(request.data)
+        cleanliness = request.data.get('cleanliness', None)
+        timeliness_of_check_in = request.data.get('timeliness_of_check_in', None)
+        location = request.data.get('location', None)
+        conformity_to_photos = request.data.get('conformity_to_photos', None)
+        price_quality = request.data.get('price_quality', None)
+        quality_of_service = request.data.get('quality_of_service', None)
+        room_object_id = request.data.get('room_object', None)
+
+        if all(
+                (
+                        cleanliness,
+                        timeliness_of_check_in,
+                        location,
+                        conformity_to_photos,
+                        price_quality,
+                        quality_of_service,
+                        room_object_id
+                )
+        ):
+            serializer_rating = serializers.RatingSerializer(
+                data={
+                    "cleanliness":cleanliness,
+                    "timeliness_of_check_in":timeliness_of_check_in,
+                    "location":location,
+                    "conformity_to_photos":conformity_to_photos,
+                    "price_quality":price_quality,
+                    "quality_of_service":quality_of_service,
+                    "room_object":room_object_id
+                }
+            )
+
+            if serializer_rating.is_valid():
+                print(serializer_rating.validated_data)
+                return Response({"success": "TEST SendComment"})
+            else:
+                print('ERROR', serializer_rating.errors)
+                return Response({"error": "TEST SendComment_serializator"})
+            # RatingModel - положить оценки + id room_object
+            # ReviewsModel - поместить тест комментария review_text; room_object; user; ratings
+
+        else:
+            return Response({"error": "TEST SendComment"})

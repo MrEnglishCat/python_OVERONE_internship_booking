@@ -507,7 +507,7 @@ class RatingModel(models.Model):
     price_quality = models.PositiveSmallIntegerField(default=0, validators=(MinValueValidator(0.0), MaxValueValidator(10.0)), verbose_name="Цена-качество")
     location = models.PositiveSmallIntegerField(default=0, validators=(MinValueValidator(0.0), MaxValueValidator(10.0)), verbose_name="Расположение")
     quality_of_service = models.PositiveSmallIntegerField(default=0, validators=(MinValueValidator(0.0), MaxValueValidator(10.0)), verbose_name="Качество обслуживания")
-    object_room = models.ForeignKey(ObjectRoomModel, on_delete=models.DO_NOTHING, null=True, blank=True, verbose_name="Объект")
+    room_object = models.ForeignKey(ObjectRoomModel, on_delete=models.DO_NOTHING, verbose_name="Объект")
 
     class Meta:
         db_table = '"api_ratings"'
