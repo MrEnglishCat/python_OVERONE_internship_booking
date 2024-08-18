@@ -150,9 +150,9 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     # filter_backends = (filters.OrderingFilter,)
     # ordering_fields = '__all__'  # TODO нужны для возможности сортировки отзывов
 
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwargs):
         object_id = self.kwargs.get('room_object_id', None)
-
+        print(kwargs)
         if object_id and object_id.isdigit():
 
             result = models.ReviewsModel.objects.filter(room_object_id=int(object_id))
@@ -189,7 +189,7 @@ class AllStarsObjectRoomViewSet(viewsets.ReadOnlyModelViewSet):
     #         return models.RatingModel.objects.none()
 
     def retrieve(self, request, pk=None):  # TODO узнать для чего этот метод
-        queryset = models.RatingModel.objects.filter(object_room_id=pk).aggregate(
+        queryset = models.RatingModel.objects.filter(room_object=pk).aggregate(
             Avg("cleanliness", default=0),
             Avg("conformity_to_photos", default=0),
             Avg("timeliness_of_check_in", default=0),
@@ -407,8 +407,10 @@ class SendCommentViewSet(APIView):
         conformity_to_photos = request.data.get('conformity_to_photos', None)
         price_quality = request.data.get('price_quality', None)
         quality_of_service = request.data.get('quality_of_service', None)
-        room_object_id = request.data.get('room_object', None)
 
+        review_text = request.data.get('review_text', None)
+        room_object_id = request.data.get('room_object', None)
+        user_id = request.data.get('tenant', None)
         if all(
                 (
                         cleanliness,
@@ -417,7 +419,9 @@ class SendCommentViewSet(APIView):
                         conformity_to_photos,
                         price_quality,
                         quality_of_service,
-                        room_object_id
+                        room_object_id,
+                        review_text,
+                        user_id,
                 )
         ):
             serializer_rating = serializers.RatingSerializer(
@@ -428,9 +432,17 @@ class SendCommentViewSet(APIView):
                     "conformity_to_photos":conformity_to_photos,
                     "price_quality":price_quality,
                     "quality_of_service":quality_of_service,
-                    "room_object":room_object_id
+                    "room_object":room_object_id,
                 }
             )
+
+            # serializer_review = serializers.ReviewSerializer(
+            #     data={
+            #         "review_text":review_text,
+            #         "room_object":room_object_id,
+            #         "user_id":user_id
+            #     }
+            # )
 
             if serializer_rating.is_valid():
                 print(serializer_rating.validated_data)
@@ -438,7 +450,7 @@ class SendCommentViewSet(APIView):
             else:
                 print('ERROR', serializer_rating.errors)
                 return Response({"error": "TEST SendComment_serializator"})
-            # RatingModel - положить оценки + id room_object
+
             # ReviewsModel - поместить тест комментария review_text; room_object; user; ratings
 
         else:
