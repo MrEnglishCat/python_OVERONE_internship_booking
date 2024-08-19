@@ -89,6 +89,10 @@ class RatingSerializer(serializers.ModelSerializer):
         model = models.RatingModel
         fields = '__all__'
 
+class DefaultReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ReviewsModel
+        fields = '__all__'
 
 class ReviewsSerializer(serializers.ModelSerializer):
     ratings = RatingSerializer()

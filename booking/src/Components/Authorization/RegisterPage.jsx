@@ -1,5 +1,8 @@
 import React, {useState} from "react";
 import {Route, Link, Routes, useNavigate} from "react-router-dom";
+import Alert from "@mui/material/Alert";
+
+
 
 function RegisterPage() {
     const API_REGISTER = "http://127.0.0.1:8000/api/v1/auth/token/register/"
@@ -88,7 +91,7 @@ function RegisterPage() {
                         <div class="text-center my-5">
                             <img src="/image/logo/kvartirnik_logo.png" alt="logo" className="w-100"/>
                         </div>
-                        {error ? <div className="alert alert-danger">{error}</div>: ""}
+                        {error ? <Alert severity="error">{error}</Alert>: ""}
                         <div></div>
                         <div class="card shadow-lg   rounded-5">
                             <div class="card-body p-5">

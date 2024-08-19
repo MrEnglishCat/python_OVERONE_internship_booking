@@ -16,7 +16,7 @@ const Search = () => {
 
 
     // за счет params.id можно по get запросу получить данные.
-    async function RunSearch() {
+    async function handleSearch() {
         // GET request using axios with set headers
         let tk = sessionStorage.auth_token;
         console.log("SEARCH tk: ", tk);
@@ -68,7 +68,7 @@ const Search = () => {
                                        id="input_search_datetime_departure"
                                 />
                                 <button className="btn btn-danger" type="button" id="button-addon2"
-                                        onClick={RunSearch}>Найти...
+                                        onClick={handleSearch}>Найти...
                                 </button>
                             </div>
                         </div>

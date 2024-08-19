@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Route, Link, Routes, useNavigate, Navigate, useLocation,} from "react-router-dom";
 import axios from "axios";
 import * as loginForm from "react-dom/test-utils";
+import Alert from "@mui/material/Alert";
 
 
 function LoginPage() {
@@ -93,7 +94,7 @@ function LoginPage() {
                         <div className="text-center my-5">
                             <img src="/image/logo/kvartirnik_logo.png" alt="logo" className="w-100 "/>
                         </div>
-                        {error ? <div className="alert alert-danger">{error}</div>: ""}
+                        {error ? <Alert severity="error">{error}</Alert>: ""}
                         <div className="card shadow-lg   rounded-5">
                             <div className="card-body p-5 ">
                                 <h1 className="fs-4 card-title fw-bold mb-4">Login</h1>

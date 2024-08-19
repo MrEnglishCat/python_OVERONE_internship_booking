@@ -11,11 +11,11 @@ import SendReview from "./reviews/SendReview";
 import Images from "../General page/Images"
 import ImagesC from "../Main page/ImageCarousel";
 import Image from "../General page/Image";
-import Textarea from "@mui/joy";
-
 
 
 import {Paper, Box, ImageList} from '@mui/material'
+import {Container, Textarea} from "@mui/joy";
+
 const Card = (props) => {
 
     // получаем параметры
@@ -113,10 +113,11 @@ const Card = (props) => {
                         </p>
                         <div className="container">
                             {/*<div className="col-lg-3 col-12 ">*/}
-                                {
-                                    images ? <Box sx={{ maxWidth: 800, flexGrow: 1, margin: 'auto', mt: 5 }}><ImagesC image_list={images} height={600}/></Box> :
-                                        <Image image="/image/user_objects/nophoto_object.jpg"/>
-                                }
+                            {
+                                images ? <Box sx={{maxWidth: 800, flexGrow: 1, margin: 'auto', mt: 5}}><ImagesC
+                                        image_list={images} height={600}/></Box> :
+                                    <Image image="/image/user_objects/nophoto_object.jpg"/>
+                            }
                             {/*</div>*/}
                         </div>
                         <br/>
@@ -244,32 +245,33 @@ const Card = (props) => {
                                         </span>
 
                                         :
-                                        <div className="container">
-                                            <div className="row align-items-center">
-                                                <div className="col align-text-center"></div>
+                                        <Container maxWidth="lg" style={{textAlign: "justify"}}>
+                                            <div className="col align-text-center"></div>
 
-                                                <div className="col align-text-center">
-                                                    Пока что отзывов нету. Будьте
-                                                    первым! <br/><br/><br/>
-                                                    {sessionStorage.getItem("auth_token") ?
-                                                        <SendReview room_object={props.item}/>
-                                                        : <p>
-                                                            <a href="/login">Авторизуйтесь</a> для того что бы
-                                                            оставить
-                                                            отзыв!
-                                                        </p>}
-                                                </div>
-                                                <div className="col align-text-center"></div>
+                                            <div className="col align-text-center">
+                                                Пока что отзывов нету. Будьте
+                                                первым! <br/><br/><br/>
+                                                {sessionStorage.getItem("auth_token") ?
+                                                    <SendReview room_object={props.item}/>
+                                                    : <p>
+                                                        <a href="/login">Авторизуйтесь</a> для того что бы
+                                                        оставить
+                                                        отзыв!
+                                                    </p>}
                                             </div>
-                                        </div>
+                                            <div className="col align-text-center"></div>
+                                        </Container>
+
 
                                     }
 
                                 </span>
 
-                                {
-                                    (props.reviews.length > 0) ?
-                                        <span>
+                                <Container maxWidth="lg" style={{textAlign: "justify"}}>
+
+                                    {
+                                        (props.reviews.length > 0) ?
+                                            <span>
                                                 <TotalStars star={stars}/>
                                             <div className="container">
                                                 {sessionStorage.getItem("auth_token") ?
@@ -278,11 +280,11 @@ const Card = (props) => {
                                                         <a href="/login">Авторизуйтесь</a> для того что бы оставить
                                                         отзыв!
                                                     </div>}
-                                            </div>
+                                            </div><br/>
                                                 <Reviews reviews={props.reviews}/>
                                             </span> : ""
-                                }
-
+                                    }
+                                </Container>
                             </div>
                         </div>
 
@@ -290,7 +292,8 @@ const Card = (props) => {
                     </div>
                 </div>
                 <div className="col-lg-4">
-                    <Booking prepayment={props.item.prepayment} payment_day={props.item.payment_day} room_object={props.item.id}/>
+                    <Booking prepayment={props.item.prepayment} payment_day={props.item.payment_day}
+                             room_object={props.item.id}/>
                 </div>
             </div>
             <Routes>

@@ -398,19 +398,36 @@ class FavoriteViewSet(APIView):
 class SendCommentViewSet(APIView):
     permission_classes = (permissions.AllowAny,)
 
+    def __check_value(self, value):
+        """
+        проверка валидности принятой оценки. Должен быть диапазон 0-10. Если переданное значение выходит за указанный
+        диапазон, то метод вернет либо 0, либо 10. В зависимости от того за какую границу выходит принятое значение.
+        """
+        if value is None:
+            return None
+        value = int(value)
+        check_value_10 = 10
+        check_value_0 = 0
+        if value > 10:
+            return check_value_10
+        elif value < 0:
+            return check_value_0
+        return value
+
     def post(self, request, *args, **kwargs):
         # TODO передать id юзера достать из jwt токена!
-        # print(request.data)
-        cleanliness = request.data.get('cleanliness', None)
-        timeliness_of_check_in = request.data.get('timeliness_of_check_in', None)
-        location = request.data.get('location', None)
-        conformity_to_photos = request.data.get('conformity_to_photos', None)
-        price_quality = request.data.get('price_quality', None)
-        quality_of_service = request.data.get('quality_of_service', None)
 
-        review_text = request.data.get('review_text', None)
+        cleanliness = self.__check_value(request.data.get('cleanliness', None))
+        timeliness_of_check_in = self.__check_value(request.data.get('timeliness_of_check_in', None))
+        location = self.__check_value(request.data.get('location', None))
+        conformity_to_photos = self.__check_value(request.data.get('conformity_to_photos', None))
+        price_quality = self.__check_value(request.data.get('price_quality', None))
+        quality_of_service = self.__check_value(request.data.get('quality_of_service', None))
+
+        review_text = request.data.get('review_text', "")
         room_object_id = request.data.get('room_object', None)
         user_id = request.data.get('tenant', None)
+        # print(request.data)
         if all(
                 (
                         cleanliness,
@@ -420,7 +437,7 @@ class SendCommentViewSet(APIView):
                         price_quality,
                         quality_of_service,
                         room_object_id,
-                        review_text,
+                        # review_text,
                         user_id,
                 )
         ):
@@ -458,12 +475,14 @@ class SendCommentViewSet(APIView):
                 #         ErrorDetail(string='Обязательное поле.', code='required')
                 #     ]
                 # }
-                serializer_review = serializers.ReviewsSerializer(
+                rating_save = serializer_rating.save()
+
+                serializer_review = serializers.DefaultReviewSerializer(
                     data={
                         "review_text": review_text,
                         "room_object": room_object_id,
-                        "user": '1',
-                        "ratings": '2'
+                        "user": user_id,
+                        "ratings": rating_save.id,
                     }
                 )
                 serializer_review.is_valid()
