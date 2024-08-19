@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.forms import Textarea
+
 from . import models
 from django.contrib.admin.views.main import ChangeList
 from django.core.paginator import EmptyPage, InvalidPage, Paginator
@@ -171,6 +173,7 @@ class InlineReviewsAdmin(admin.TabularInline):
     can_delete = True
     # inlines = (InlineRatingAdmin,)
     classes = ['collapse']
+
 
 @admin.register(models.RatingModel)
 class RatingAdmin(admin.ModelAdmin):

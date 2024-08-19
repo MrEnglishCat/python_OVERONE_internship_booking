@@ -424,10 +424,12 @@ class SendCommentViewSet(APIView):
         price_quality = self.__check_value(request.data.get('price_quality', None))
         quality_of_service = self.__check_value(request.data.get('quality_of_service', None))
 
-        review_text = request.data.get('review_text', "")
+        positive_comment = request.data.get('positive_comment', "")
+        negative_comment = request.data.get('negative_comment', "")
+
         room_object_id = request.data.get('room_object', None)
         user_id = request.data.get('tenant', None)
-        # print(request.data)
+        print(request.data)
         if all(
                 (
                         cleanliness,
@@ -475,25 +477,33 @@ class SendCommentViewSet(APIView):
                 #         ErrorDetail(string='Обязательное поле.', code='required')
                 #     ]
                 # }
-                rating_save = serializer_rating.save()
+                try:
+                    review_item = models.ReviewsModel.objects.get(room_object=room_object_id, user=user_id)
+                    print("review_item", review_item)
+                    return Response({"error": "Вы уже оставляли комментарий. Желаете его отредактировать?"}, status=status.HTTP_400_BAD_REQUEST)
+                except Exception as e:
+                    rating_save = serializer_rating.save()
 
-                serializer_review = serializers.DefaultReviewSerializer(
-                    data={
-                        "review_text": review_text,
-                        "room_object": room_object_id,
-                        "user": user_id,
-                        "ratings": rating_save.id,
-                    }
-                )
-                serializer_review.is_valid()
-                print('review_serlz', serializer_review.validated_data, serializer_review.errors)
+                    serializer_review = serializers.DefaultReviewSerializer(
+                        data={
+                            "positive_comment": positive_comment,
+                            "negative_comment": negative_comment,
+                            "room_object": room_object_id,
+                            "user": user_id,
+                            "ratings": rating_save.id,
+                        }
+                    )
+                    serializer_review.is_valid()
+                    serializer_review.save()
 
-                return Response({"success": "TEST SendComment"})
+                    print('review_serlz', serializer_review.validated_data, serializer_review.errors)
+
+                    return Response({"success": "TEST SendComment created"}, status=status.HTTP_200_OK)
             else:
                 print('ERROR', serializer_rating.errors)
-                return Response({"error": "TEST SendComment_serializator"})
+                return Response({"error": "TEST SendComment_serializator"}, status=status.HTTP_400_BAD_REQUEST)
 
             # ReviewsModel - поместить тест комментария review_text; room_object; user; ratings
 
         else:
-            return Response({"error": "TEST SendComment"})
+            return Response({"error": "TEST SendComment"}, status=status.HTTP_400_BAD_REQUEST)

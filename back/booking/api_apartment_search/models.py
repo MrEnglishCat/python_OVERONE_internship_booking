@@ -518,7 +518,8 @@ class RatingModel(models.Model):
         return f"{(self.cleanliness + self.conformity_to_photos + self.timeliness_of_check_in + self.price_quality + self.location + self.quality_of_service)/6}"
 
 class ReviewsModel(models.Model):
-    review_text = models.TextField( null=True, blank=True, verbose_name="Отзыв")
+    positive_comment = models.TextField(null=True, blank=True, verbose_name="Отзыв")
+    negative_comment = models.TextField(null=True, blank=True, verbose_name="Отзыв")
     review_created = models.DateTimeField(auto_now_add=True, auto_created=True, verbose_name="Дата создания")
     review_updated = models.DateTimeField(auto_now=True, null=True, blank=True, verbose_name="Дата редактирования")
     likes = models.PositiveIntegerField(default=0, verbose_name="Нравится")  # positive_sides

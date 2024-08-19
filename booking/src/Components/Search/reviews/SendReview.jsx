@@ -10,6 +10,7 @@ import Skeleton from '@mui/joy/Skeleton';
 import {Grid3x3, Grid3x3Sharp} from "@mui/icons-material";
 import Grid2 from "@mui/material/Unstable_Grid2";
 import {Container} from "@mui/joy";
+import Alert from "@mui/material/Alert";
 
 const SendReview = (props) => {
     const navigate = useNavigate();
@@ -116,10 +117,6 @@ const SendReview = (props) => {
     }
 
 
-
-
-
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         const cleanliness = document.getElementById("cleanliness")
@@ -128,11 +125,11 @@ const SendReview = (props) => {
         const conformity_to_photos = document.getElementById("conformity_to_photos")
         const price_quality = document.getElementById("price_quality")
         const quality_of_service = document.getElementById("quality_of_service")
-        const comment = document.getElementById("comment")
-        // const user_id = parseJwt(sessionStorage.getItem('auth_token').refresh).user_id
+        const positive_comment = document.getElementById("positive_comment")
+        const negative_comment = document.getElementById("negative_comment")
 
 
-        if  (sessionStorage.getItem("auth_token")){
+        if (sessionStorage.getItem("auth_token")) {
             var tk = JSON.parse(sessionStorage.getItem("auth_token"));
             console.log("get_tokens_from_sessionStorage_LOGOUT", tk.refresh)
 
@@ -142,10 +139,10 @@ const SendReview = (props) => {
                 var tk = JSON.parse(sessionStorage.getItem("auth_token"));
             }
 
-        }else{
+        } else {
             var tk = {
-                access:'false',
-                refresh:'false'
+                access: 'false',
+                refresh: 'false'
             }
         }
 
@@ -168,7 +165,8 @@ const SendReview = (props) => {
                     conformity_to_photos: conformity_to_photos.value,
                     price_quality: price_quality.value,
                     quality_of_service: quality_of_service.value,
-                    review_text: comment.value,
+                    positive_comment: positive_comment.value,
+                    negative_comment: negative_comment.value
                 })
                 ,
                 headers: {
@@ -190,14 +188,24 @@ const SendReview = (props) => {
             setError(error)
         }
     }
+
+
     console.log(cleanliness)
     return (
 
         <form method="POST" className="needs-validation align-right" autoComplete="off"
               onSubmit={(e) => handleSubmit(e)}>
             <Container maxWidth="lg">
+                {error ? <Alert severity="warning">{error.error}
+                    <form>
+                 <Button onClick={() => {
+                }} type="" variant="outlined" color="success" fullWidth={true}>Да - пока что не работает</Button>
+                 <Button onClick={() => {
+                }} type="" variant="outlined" color="success" fullWidth={true}>Нет</Button></form></Alert> : ""}<br/>
+                {/*<Alert severity="warning">{error.error}</Alert><br/>*/}
 
                 <Grid container spacing={10} alignContent={"center"}>
+
                     <Grid item xs={12} sm={6} zeroMinWidth={true}>
                         <TextField
                             // sx={{
@@ -242,8 +250,15 @@ const SendReview = (props) => {
                                 shrink: true,
                             }}
                             required={true}
+                        /><br/><br/>
+                        <TextField
+                            id="positive_comment"
+                            label="Положительный отзыв"
+                            fullWidth={true}
+                            multiline
+                            maxRows={5}
+                            // required={true}
                         />
-
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <TextField
@@ -287,32 +302,22 @@ const SendReview = (props) => {
                             }}
                             required={true}
                         /><br/><br/>
+                        <TextField
+                            id="negative_comment"
+                            label="Негативный отзыв"
+                            fullWidth={true}
+                            multiline
+                            maxRows={5}
+                            // required={true}
+                        />
                     </Grid>
                 </Grid>
-                {/*<Box*/}
-                {/*    component="form"*/}
-                {/*    // sx={{*/}
-                {/*    //     '& .MuiTextField-root': {m: 0, width: '67ch'},*/}
-                {/*    // }}*/}
-                {/*    noValidate*/}
-                {/*    fullWidth={true}*/}
-                {/*    autoComplete="off"*/}
-                {/*    style={{textAlign: "left"}}*/}
-                {/*>*/}
 
-                <TextField
-                    id="comment"
-                    label="Комментарий"
-                    fullWidth={true}
-                    multiline
-                    maxRows={5}
-                    // required={true}
-                />
 
 
                 <br/><br/>
                 <Button onClick={() => {
-                }} type="submit" variant="outlined" color="success">Опубликовать</Button>
+                }} type="submit" variant="outlined" color="success" fullWidth={true}>Опубликовать</Button>
                 {/*<TextField*/}
                 {/*    id="date_range"*/}
                 {/*    select*/}
@@ -323,7 +328,8 @@ const SendReview = (props) => {
                 {/*>*/}
 
                 {/*</TextField>*/}
-                {/*</Box>*/}
+
+
             </Container>
         </form>
 

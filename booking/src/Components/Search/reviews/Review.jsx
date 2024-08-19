@@ -73,7 +73,7 @@ const Review = (props) => {
 
                 </div>
                 <div className="col-lg">
-                    {props.item.review_text}
+                    {props.item.positive_comment}
                 </div>
             </div>
             <div className="row">
@@ -89,7 +89,7 @@ const Review = (props) => {
 
                 </div>
                 <div className="col-lg">
-                    {props.item.review_text}
+                    {props.item.negative_comment}
                 </div>
             </div>
 
