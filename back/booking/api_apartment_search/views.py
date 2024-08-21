@@ -386,6 +386,7 @@ class FavoriteViewSet(APIView):
                     return Response({'success': "Добавлено в избранное!"}, status=status.HTTP_200_OK)
                 else:
                     models.FavoritesModel.objects.filter(user_id=user, room_object_id=object_id).delete()
+                    # models.FavoritesModel.objects.get(Q(user_id=user) & Q(room_object_id=object_id)).delete()
                     print(serializer.errors.get('non_field_errors', 'Ошибка валидации данных сериализатора.')[0])
                     return Response({"success": "Объект удален из избранного!"}, status=status.HTTP_200_OK)
 
